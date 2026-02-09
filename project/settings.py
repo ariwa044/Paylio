@@ -127,12 +127,12 @@ LOGOUT_REDIRECT_URL = "userauths:sign-in"
 
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.mailersend.net'
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('MAILERSEND_USERNAME', '')
-EMAIL_HOST_PASSWORD = os.environ.get('MAILERSEND_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'Paylio <MS_gYDNa1@test-69oxl5eov82l785k.mlsender.net>')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'Paylio <escrowtrade02@gmail.com>')
 EMAIL_TIMEOUT = 10  # Timeout in seconds to prevent worker hangs
 
 
