@@ -1,0 +1,191 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - Paylio</title>
+    <link rel="shortcut icon" href="{% static 'assets/images/fav.png' %}" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .error-container {
+            text-align: center;
+            max-width: 500px;
+        }
+        
+        .error-illustration {
+            position: relative;
+            margin-bottom: 40px;
+        }
+        
+        .error-code {
+            font-size: 180px;
+            font-weight: 700;
+            color: #0c266c;
+            line-height: 1;
+            letter-spacing: -10px;
+            position: relative;
+        }
+        
+        .error-code::before {
+            content: '404';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 180px;
+            font-weight: 700;
+            color: transparent;
+            -webkit-text-stroke: 2px rgba(12, 38, 108, 0.1);
+            z-index: -1;
+        }
+        
+        .error-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 60px;
+            color: #4743c9;
+            opacity: 0.15;
+        }
+        
+        .error-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+        
+        .error-message {
+            font-size: 16px;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            font-size: 15px;
+            font-weight: 500;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background: #0c266c;
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            background: #4743c9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(12, 38, 108, 0.25);
+        }
+        
+        .btn-secondary {
+            background: #fff;
+            color: #0c266c;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .btn-secondary:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        
+        .footer-text {
+            margin-top: 48px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        
+        .footer-text a {
+            color: #0c266c;
+            text-decoration: none;
+        }
+        
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 480px) {
+            .error-code {
+                font-size: 120px;
+                letter-spacing: -5px;
+            }
+            .error-code::before {
+                font-size: 120px;
+            }
+            .error-icon {
+                font-size: 40px;
+            }
+            .error-title {
+                font-size: 22px;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-illustration">
+            <div class="error-code">404</div>
+            <i class="fas fa-search error-icon"></i>
+        </div>
+        
+        <h1 class="error-title">Page not found</h1>
+        <p class="error-message">
+            Sorry, the page you're looking for doesn't exist or has been moved. 
+            Please check the URL or navigate back to our homepage.
+        </p>
+        
+        <div class="btn-group">
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Go Back
+            </a>
+        </div>
+        
+        <p class="footer-text">
+            Need help? <a href="mailto:support@paylio.com">Contact Support</a>
+        </p>
+    </div>
+</body>
+</html>

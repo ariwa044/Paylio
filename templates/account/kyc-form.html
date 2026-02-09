@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block content %}
+    <link rel="stylesheet" href="{% static 'assets1/css/custom_kyc_fix.css' %}">
     
    
     <!-- header-section end -->
@@ -16,7 +17,11 @@
                             <div class="owner-details">
                                 <div class="profile-area">
                                     <div class="profile-img">
-                                        <img style="width: 100px; hight: 100px; border-radius: 50%" src="{{kyc.image.url}}" alt="image">
+                                        {% if kyc and kyc.image %}
+                                            <img style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;" src="{{kyc.image.url}}" alt="image">
+                                        {% else %}
+                                            <img style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;" src="{% static 'assets1/images/default.jpg' %}" alt="">
+                                        {% endif %}
                                     </div>
                                     <div class="name-area">
                                         <h6>{{kyc.full_name|title}}</h6>
@@ -39,7 +44,10 @@
                                         </li>
                                         <li>
                                             <p>Pin Num:</p>
-                                            <span class="mdr">{{account.pin_number}}</span>
+                                            <span class="mdr" id="pin-display" style="font-family: Arial, sans-serif; letter-spacing: 3px; font-weight: bold;">••••</span>
+                                            <button type="button" onclick="togglePin()" style="background: none; border: none; cursor: pointer; color: var(--primary-color); font-size: 14px; margin-left: 8px; vertical-align: middle;">
+                                                <i id="pin-icon" class="fas fa-eye"></i>
+                                            </button>
                                         </li>
                                         <li>
                                             <p>Joined:</p>
@@ -55,10 +63,6 @@
                                             Logout
                                         </a>
                                     {% endif %}
-                                    <a href="javascript:void(0)" class="delete">
-                                        <img src="{% static 'assets1/images/icon/delete-2.png' %}" alt="image">
-                                        Delete Account
-                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -74,9 +78,25 @@
                                     <form method="POST" enctype="multipart/form-data">
                                         {% csrf_token %}
                                         <div class="upload-avatar">
+                                            {% if form.errors %}
+                                            <div class="alert alert-danger">
+                                                <strong>Please correct the following errors:</strong>
+                                                <ul>
+                                                    {% for field, errors in form.errors.items %}
+                                                        {% for error in errors %}
+                                                            <li>{{ field|title }}: {{ error }}</li>
+                                                        {% endfor %}
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            {% endif %}
                                             <div class="avatar-left d-flex align-items-center">
                                                 <div class="profile-img">
-                                                    <img src="{{ kyc.image.url }}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;" alt="image">
+                                                    {% if kyc and kyc.image %}
+                                                        <img src="{{ kyc.image.url }}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;" alt="image">
+                                                    {% else %}
+                                                        <img src="{% static 'assets1/images/default.jpg' %}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;" alt="default avatar">
+                                                    {% endif %}
                                                 </div>
                                                 <div class="instraction">
                                                     <h6>Your Avatar</h6>
@@ -93,6 +113,14 @@
                                                 <div class="single-input">
                                                     <label for="fName">Full Name</label>
                                                    {{form.full_name}}
+                                                   <!-- Replaced inline style with class -->
+                                                   {% if form.full_name.errors %}
+                                                    <div class="form-error-message">
+                                                        {% for error in form.full_name.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                   {% endif %}
                                                 </div>
                                             </div>
                                             
@@ -100,72 +128,148 @@
                                                 <div class="single-input">
                                                     <label for="fName">Mobile Number</label>
                                                    {{form.mobile}}
+                                                   {% if form.mobile.errors %}
+                                                    <div class="form-error-message">
+                                                        {% for error in form.mobile.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                   {% endif %}
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="single-input">
                                                     <label for="fName">Country</label>
                                                    {{form.country}}
+                                                   {% if form.country.errors %}
+                                                    <div class="form-error-message">
+                                                        {% for error in form.country.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                   {% endif %}
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="single-input">
                                                     <label for="fName">State</label>
                                                    {{form.state}}
+                                                   {% if form.state.errors %}
+                                                    <div class="form-error-message">
+                                                        {% for error in form.state.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                   {% endif %}
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="single-input">
                                                     <label for="fName">City</label>
                                                    {{form.city}}
+                                                   {% if form.city.errors %}
+                                                    <div class="form-error-message">
+                                                        {% for error in form.city.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                   {% endif %}
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="single-input">
-                                                    <label for="fName">Fax</label>
-                                                   {{form.fax}}
+                                                    <label for="fName">Mother's Maiden Name</label>
+                                                   {{form.mothers_maiden_name}}
+                                                   {% if form.mothers_maiden_name.errors %}
+                                                    <div class="form-error-message">
+                                                        {% for error in form.mothers_maiden_name.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                   {% endif %}
                                                 </div>
                                             </div>
                                             <div class="col-md-12">
                                                 <div class="single-input">
                                                     <label for="fName">Date Of Birth</label>
                                                    {{form.date_of_birth}}
+                                                   {% if form.date_of_birth.errors %}
+                                                    <div class="form-error-message">
+                                                        {% for error in form.date_of_birth.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                   {% endif %}
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="single-input">
                                                     <label for="fName">Gender</label>
                                                    {{form.gender}}
+                                                   {% if form.gender.errors %}
+                                                    <div class="form-error-message">
+                                                        {% for error in form.gender.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                   {% endif %}
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="single-input">
                                                     <label for="fName">Marrital Status</label>
-        
                                                    {{form.marital_status}}
+                                                   {% if form.marital_status.errors %}
+                                                    <div class="form-error-message">
+                                                        {% for error in form.marital_status.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                   {% endif %}
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="single-input">
                                                     <label for="fName">Identity Type</label>
                                                    {{form.identity_type}}
+                                                   {% if form.identity_type.errors %}
+                                                    <div class="form-error-message">
+                                                        {% for error in form.identity_type.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                   {% endif %}
                                                 </div>
                                             </div>
-                                            <div class="col-md-6 " style="padding-top: 50px;">
+                                            <div class="col-md-6 " style="padding-top: 10px;">
                                                 <div class="single-input">
                                                     <label for="fName">Select Identity Image</label>
 
                                                     {{form.identity_image}}
+                                                    {% if form.identity_image.errors %}
+                                                    <div class="form-error-message">
+                                                        {% for error in form.identity_image.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                   {% endif %}
                                                     {% if kyc.identity_image %}
                                                         <img src="{{ kyc.identity_image.url }}" style="width: 100%; height: 200px; border-radius: 10px; object-fit: cover; padding-top: 10px;" alt="">
                                                     {% endif %}
                                                 </div>
                                             </div>
-                                            <div class="col-md-6" style="padding-top: 50px;">
+                                            <div class="col-md-6" style="padding-top: 10px;">
                                                 <div class="single-input">
                                                     <label for="fName">Select Signature Image</label>
 
                                                     {{form.signature}}
+                                                    {% if form.signature.errors %}
+                                                    <div class="form-error-message">
+                                                        {% for error in form.signature.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                   {% endif %}
                                                     {% if kyc.signature %}
                                                         <img src="{{ kyc.signature.url }}" style="width: 100%; height: 200px; border-radius: 10px; object-fit: cover; padding-top: 10px;" alt="">
                                                     {% endif %}
@@ -180,210 +284,7 @@
                                         </div>
                                     </form>
                                     </div>
-                                    <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
-                                        <div class="single-content authentication d-flex align-items-center justify-content-between">
-                                            <div class="left">
-                                                <h5>Two Factor Authentication</h5>
-                                                <p>Two-Factor Authentication (2FA) can be used to help protect your account</p>
-                                            </div>
-                                            <div class="right">
-                                                <button>Enable</button>
-                                            </div>
-                                        </div>
-                                        <div class="change-pass mb-40">
-                                            <div class="row">
-                                                <div class="col-sm-6">
-                                                    <h5>Change Password</h5>
-                                                    <p>You can always change your password for security reasons or reset your password in case you forgot it.</p>
-                                                    <a href="javascript:void(0)">Forgot password?</a>
-                                                </div>
-                                                <div class="col-sm-6">
-                                                    <form action="#">
-                                                        <div class="row justify-content-center">
-                                                            <div class="col-md-12">
-                                                                <div class="single-input">
-                                                                    <label for="current-password">Current password</label>
-                                                                    <input type="text" id="current-password" placeholder="Current password">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-12">
-                                                                <div class="single-input">
-                                                                    <label for="new-password">New password</label>
-                                                                    <input type="text" id="new-password" placeholder="New password">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-12">
-                                                                <div class="single-input">
-                                                                    <label for="confirm-password">Confirm New password</label>
-                                                                    <input type="text" id="confirm-password" placeholder="Confirm New password">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-12">
-                                                                <div class="btn-border w-100">
-                                                                    <button class="cmn-btn w-100">Update password</button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="single-content additional-security">
-                                            <h5>Additional security</h5>
-                                            <div class="single-setting">
-                                                <div class="left">
-                                                    <h6>SMS recovery</h6>
-                                                    <p>Number ending with 1234</p>
-                                                </div>
-                                                <div class="right">
-                                                    <button class="active">Disable SMS</button>
-                                                </div>
-                                            </div>
-                                            <div class="single-setting">
-                                                <div class="left">
-                                                    <h6>Autheticator App</h6>
-                                                    <p>Google Authenticator</p>
-                                                </div>
-                                                <div class="right">
-                                                    <button>Configure</button>
-                                                </div>
-                                            </div>
-                                            <div class="single-setting">
-                                                <div class="left">
-                                                    <h6>SSL Certificate</h6>
-                                                    <p>Secure Sockets Layer</p>
-                                                </div>
-                                                <div class="right">
-                                                    <button>Configure</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="single-content your-devices">
-                                            <div class="head-item d-flex align-items-center justify-content-between">
-                                                <h5>Your devices</h5>
-                                                <a href="javascript:void(0)">Log out on all devices</a>
-                                            </div>
-                                            <div class="single-setting">
-                                                <div class="left">
-                                                    <div class="icon-area">
-                                                        <img src="{% static 'assets1/images/icon/iphone.png' %}" alt="icon">
-                                                    </div>
-                                                    <div class="text-area">
-                                                        <h6>Iphone 13 Pro Max</h6>
-                                                        <p>New York City · June 20 at 14:00</p>
-                                                    </div>
-                                                </div>
-                                                <div class="right">
-                                                    <button>Log out</button>
-                                                </div>
-                                            </div>
-                                            <div class="single-setting">
-                                                <div class="left">
-                                                    <div class="icon-area">
-                                                        <img src="{% static 'assets1/images/icon/ipad.png' %}" alt="icon">
-                                                    </div>
-                                                    <div class="text-area">
-                                                        <h6>iPad Pro</h6>
-                                                        <p>New York City · June 20 at 14:00</p>
-                                                    </div>
-                                                </div>
-                                                <div class="right">
-                                                    <button>Log out</button>
-                                                </div>
-                                            </div>
-                                            <div class="single-setting">
-                                                <div class="left">
-                                                    <div class="icon-area">
-                                                        <img src="{% static 'assets1/images/icon/imac.png' %}" alt="icon">
-                                                    </div>
-                                                    <div class="text-area">
-                                                        <h6>iMac OSX</h6>
-                                                        <p>New York City · June 20 at 14:00</p>
-                                                    </div>
-                                                </div>
-                                                <div class="right">
-                                                    <button>Log out</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="tab-pane pb-120 fade" id="payment" role="tabpanel" aria-labelledby="payment-tab">
-                                        <div class="card-area">
-                                            <h6>Linked Payment system</h6>
-                                            <div class="card-content d-flex flex-wrap">
-                                                <div class="single-card">
-                                                    <button type="button" class="reg w-100" data-bs-toggle="modal" data-bs-target="#transactionsMod">
-                                                        <img src="{% static 'assets1/images/visa-card.png' %}" alt="image" class="w-100">
-                                                    </button>
-                                                </div>
-                                                <div class="single-card">
-                                                    <button type="button" class="reg w-100" data-bs-toggle="modal" data-bs-target="#transactionsMod">
-                                                        <img src="{% static 'assets1/images/paylio-card.png' %}" alt="image" class="w-100">
-                                                    </button>
-                                                </div>
-                                                <div class="single-card">
-                                                    <button type="button" class="reg w-100" data-bs-toggle="modal" data-bs-target="#transactionsMod">
-                                                        <img src="{% static 'assets1/images/paypal-card.png' %}" alt="image" class="w-100">
-                                                    </button>
-                                                </div>
-                                                <div class="single-card">
-                                                    <button type="button" class="reg w-100" data-bs-toggle="modal" data-bs-target="#transactionsMod">
-                                                        <img src="{% static 'assets1/images/blockchain-card.png' %}" alt="image" class="w-100">
-                                                    </button>
-                                                </div>
-                                                <div class="single-card">
-                                                    <button type="button" class="reg w-100" data-bs-toggle="modal" data-bs-target="#addcardMod">
-                                                        <img src="{% static 'assets1/images/add-new.png' %}" alt="image" class="w-100">
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="tab-pane fade" id="notification" role="tabpanel" aria-labelledby="notification-tab">
 
-                                        <div class="notification-single">
-                                            <h6>Announcements</h6>
-                                            <label class="switch">
-                                                <input type="checkbox" checked>
-                                                <span class="slider round"></span>
-                                            </label>
-                                        </div>
-                                        <div class="notification-single">
-                                            <h6>Send payment</h6>
-                                            <label class="switch">
-                                                <input type="checkbox" checked>
-                                                <span class="slider round"></span>
-                                            </label>
-                                        </div>
-                                        <div class="notification-single">
-                                            <h6>Receive a payment</h6>
-                                            <label class="switch">
-                                                <input type="checkbox" checked>
-                                                <span class="slider round"></span>
-                                            </label>
-                                        </div>
-                                        <div class="notification-single">
-                                            <h6>Request payment</h6>
-                                            <label class="switch">
-                                                <input type="checkbox" checked>
-                                                <span class="slider round"></span>
-                                            </label>
-                                        </div>
-                                        <div class="notification-single">
-                                            <h6>Have a problem with a payment</h6>
-                                            <label class="switch">
-                                                <input type="checkbox">
-                                                <span class="slider round"></span>
-                                            </label>
-                                        </div>
-                                        <div class="notification-single">
-                                            <h6>Special Offers</h6>
-                                            <label class="switch">
-                                                <input type="checkbox" checked>
-                                                <span class="slider round"></span>
-                                            </label>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -518,5 +419,25 @@
     </div>
     <!-- My Card Popup start -->
  
+<script>
+    var pinVisible = false;
+    var actualPin = "{{account.pin_number}}";
+    
+    function togglePin() {
+        var pinDisplay = document.getElementById('pin-display');
+        var pinIcon = document.getElementById('pin-icon');
+        
+        if (pinVisible) {
+            pinDisplay.textContent = '••••';
+            pinIcon.classList.remove('fa-eye-slash');
+            pinIcon.classList.add('fa-eye');
+        } else {
+            pinDisplay.textContent = actualPin;
+            pinIcon.classList.remove('fa-eye');
+            pinIcon.classList.add('fa-eye-slash');
+        }
+        pinVisible = !pinVisible;
+    }
+</script>
 
     {% endblock content %}

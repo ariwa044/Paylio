@@ -43,15 +43,22 @@ class Account(models.Model):
     id = models.UUIDField(primary_key=True, unique=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     account_balance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
-    account_number = ShortUUIDField(length=10, unique=True,max_length= 25, prefix="217", alphabet="1234567890" )
-    account_id = ShortUUIDField(length=7, unique=True,max_length= 25, prefix="DEX", alphabet="1234567890" )
-    pin_number = ShortUUIDField(length=4, unique=True,max_length= 7 , alphabet="1234567890" )
-    red_code = ShortUUIDField(length=10, unique=True,max_length= 20, prefix="217", alphabet="abcdefghi1234567890" )
+    account_number = ShortUUIDField(length=10, unique=True, max_length=25, prefix="60", alphabet="1234567890" )
+    account_id = ShortUUIDField(length=7, unique=True, max_length=25, prefix="DEX", alphabet="1234567890" )
+    pin_number = ShortUUIDField(length=4, unique=True, max_length=7 , alphabet="1234567890" )
+    red_code = ShortUUIDField(length=10, unique=True, max_length=20, prefix="217", alphabet="abcdefghi1234567890" )
     account_status = models.CharField(max_length=100, choices= ACCOUNT_STATUS, default="in-active")
     date = models.DateTimeField(auto_now_add=True)
     kyc_submitted = models.BooleanField(default=False)
     kyc_confirmed = models.BooleanField(default=False)
+    kyc_reviewed_by = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name="kyc_reviews")
+    kyc_reviewed_at = models.DateTimeField(blank=True, null=True)
+    kyc_rejection_reason = models.TextField(blank=True, null=True)
     recommended_by = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True, related_name="recommended_by")
+    
+    # PIN Security
+    failed_pin_attempts = models.IntegerField(default=0)
+    pin_lockout_until = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         ordering = ['-date']
@@ -91,7 +98,7 @@ class KYC(models.Model):
 
     # Contact Detail
     mobile = models.CharField(max_length=1000)
-    fax = models.CharField(max_length=1000)
+    mothers_maiden_name = models.CharField(max_length=200, blank=True, null=True)
     date = models.DateTimeField(auto_now_add=True)
 
 

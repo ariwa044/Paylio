@@ -1,0 +1,96 @@
+{% extends 'partials/dashboard-base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="dashboard-section body-collapse">
+    <div class="overlay pt-120">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="content-wrapper">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="section-header d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h4>Saved Beneficiaries</h4>
+                                        <p class="mdr">Quick transfer to your saved recipients</p>
+                                    </div>
+                                    <a href="{% url 'core:add-beneficiary' %}" class="cmn-btn">
+                                        <i class="fas fa-plus"></i> Add Beneficiary
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                {% if beneficiaries %}
+                                <div class="row">
+                                    {% for beneficiary in beneficiaries %}
+                                    <div class="col-md-6 col-lg-4 mb-4">
+                                        <div class="card border h-100">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                                    <div>
+                                                        <h5 class="card-title mb-1">{{ beneficiary.name }}</h5>
+                                                        <p class="text-muted mb-0">
+                                                            <small>{{ beneficiary.bank_name }}</small>
+                                                        </p>
+                                                    </div>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-link" data-bs-toggle="dropdown">
+                                                            <i class="fas fa-ellipsis-v"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu">
+                                                            <li>
+                                                                <a class="dropdown-item text-danger"
+                                                                    href="{% url 'core:delete-beneficiary' beneficiary.id %}"
+                                                                    onclick="return confirm('Remove this beneficiary?')">
+                                                                    <i class="fas fa-trash"></i> Remove
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+
+                                                <div class="beneficiary-details mb-3">
+                                                    <p class="mb-1">
+                                                        <small class="text-muted">Account Number:</small><br>
+                                                        <strong>{{ beneficiary.account_number }}</strong>
+                                                    </p>
+                                                    {% if beneficiary.last_used %}
+                                                    <p class="mb-0">
+                                                        <small class="text-muted">Last used: {{
+                                                            beneficiary.last_used|timesince }} ago</small>
+                                                    </p>
+                                                    {% endif %}
+                                                </div>
+
+                                                <a href="{% url 'core:transfer-to-beneficiary' beneficiary.id %}"
+                                                    class="btn btn-primary btn-block">
+                                                    <i class="fas fa-paper-plane"></i> Transfer Now
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <div class="text-center p-5">
+                                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                    <h5>No Saved Beneficiaries</h5>
+                                    <p class="text-muted">Add frequently used recipients for quick transfers</p>
+                                    <a href="{% url 'core:add-beneficiary' %}" class="cmn-btn mt-3">
+                                        <i class="fas fa-plus"></i> Add Your First Beneficiary
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

@@ -27,9 +27,9 @@ SECRET_KEY = "django-insecure-t1jnbks1gk$3v1!xp#r*gw-qdot^-ax&f_phn71904r3w*erdh
 #SECRET_KEY = 'os.environ.get("SECRET_KEY")'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-#ALLOWED_HOSTS = ['banking-app-with-django-production.up.railway.app']
+ALLOWED_HOSTS = ['*','banking-app-with-django-production.up.railway.app']
 
 
 # Application definition
@@ -49,12 +49,19 @@ INSTALLED_APPS = [
     "account",
 ]
 
+# NOWPayments Configuration
+NOWPAYMENTS_API_KEY = 'YOUR-API-KEY'  # Replace with your actual API key
+NOWPAYMENTS_IPN_SECRET_KEY = 'YOUR-IPN-SECRET'  # Replace with your IPN secret key
+NOWPAYMENTS_SANDBOX = True  # Set to False in production
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # WhiteNoise for static files in production
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "core.middleware.AccountFreezeMiddleware",  # Account freeze enforcement
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -133,6 +140,15 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGIN_URL = "userauths:sign-in"
 LOGOUT_REDIRECT_URL = "userauths:sign-in"
 
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.mailersend.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('MAILERSEND_USERNAME', 'MS_gYDNa1@test-69oxl5eov82l785k.mlsender.net') # Placeholder/Env
+EMAIL_HOST_PASSWORD = os.environ.get('MAILERSEND_PASSWORD', 'mssp.iav2iMJ.0r83ql38vyv4zw1j.hOSxFS7') # Set this in environment variables!
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'Paylio <MS_gYDNa1@test-69oxl5eov82l785k.mlsender.net>')
+
 
 
 
@@ -155,13 +171,19 @@ USE_TZ = True
 #STATIC_URL = "static/"
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR,"staticfiles")
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_DIRS = [
-    BASE_DIR/ "static",
+    BASE_DIR / "static",
 ]
+
+# WhiteNoise static files storage for production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
+
+# WhiteNoise can also serve media files (optional, for user uploads)
+WHITENOISE_ROOT = MEDIA_ROOT
 
 
 # Default primary key field type

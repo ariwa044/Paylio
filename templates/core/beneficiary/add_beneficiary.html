@@ -1,0 +1,95 @@
+{% extends 'partials/dashboard-base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="dashboard-section body-collapse">
+    <div class="overlay pt-120">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="content-wrapper">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="section-header">
+                                    <h4>Add Beneficiary</h4>
+                                    <p class="mdr">Save a recipient for quick future transfers</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xl-6 col-lg-8 mx-auto">
+                                <div class="single-box p-5">
+                                    <form method="POST">
+                                        {% csrf_token %}
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="single-input">
+                                                    <label for="bank_name">Bank Name</label>
+                                                    <select class="form-control" name="bank_name" id="bank_name"
+                                                        required>
+                                                        <option value="Paylio">Paylio (Internal)</option>
+                                                        <option value="Chase Bank">Chase Bank</option>
+                                                        <option value="Bank of America">Bank of America</option>
+                                                        <option value="Wells Fargo">Wells Fargo</option>
+                                                        <option value="Citibank">Citibank</option>
+                                                        <option value="US Bank">US Bank</option>
+                                                        <option value="Barclays">Barclays</option>
+                                                        <option value="HSBC">HSBC</option>
+                                                        <option value="Other">Other</option>
+                                                    </select>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-3">
+                                            <div class="col-md-12">
+                                                <div class="single-input">
+                                                    <label for="account_number">Account Number</label>
+                                                    <input type="text" name="account_number" id="account_number"
+                                                        required placeholder="Enter recipient's account number">
+                                                    <small class="form-text text-muted">The account number of the person
+                                                        you want to save</small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-3">
+                                            <div class="col-md-12">
+                                                <div class="single-input">
+                                                    <label for="name">Name</label>
+                                                    <input type="text" name="name" id="name" required
+                                                        placeholder="e.g., Mom, John, Supplier">
+                                                    <small class="form-text text-muted">A friendly name to identify this
+                                                        beneficiary</small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="alert alert-info mt-4">
+                                            <i class="fas fa-info-circle"></i> You can quickly transfer to saved
+                                            beneficiaries without entering their account number each time.
+                                        </div>
+
+                                        <div class="row mt-4">
+                                            <div class="col-md-6">
+                                                <a href="{% url 'core:beneficiary-list' %}"
+                                                    class="btn btn-secondary btn-block">Cancel</a>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <button type="submit" class="cmn-btn btn-block">Add Beneficiary</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

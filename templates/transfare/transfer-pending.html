@@ -1,0 +1,37 @@
+{% extends 'partials/dashboard-base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+<!-- Dashboard Section start -->
+<section class="dashboard-section body-collapse pay step step-2 step-3 receive-3">
+    <div class="overlay pt-120">
+        <div class="container-fruid">
+            <div class="main-content">
+                <div class="head-area d-flex align-items-center justify-content-between">
+                    <h4>Make a Payment</h4>
+                    <div class="icon-area">
+                        <img src="{% static 'assets1/images/icon/support-icon.png' %}" alt="icon">
+                    </div>
+                </div>
+                <div class="request-submitted pb-120 text-center">
+                    <div class="top-area">
+                        <div class="icon-area">
+                            <img src="{% static 'assets1/images/icon/pending-icon.png' %}" alt="icon">
+                        </div>
+                        <h3>Processing</h3>
+                        <p>Your transaction <b>{{transaction.transaction_id}}</b> is currently <b>pending
+                                processing</b>.</p>
+                        <p>The funds will be credited to <b>{{transaction.receiver_name}}</b> once approved.</p>
+                        <h5><a href="{% url 'core:transaction-detail' transaction.transaction_id %}"><b> View
+                                    Detail</b></a> | <a href="{% url 'core:transfer-selection' %}"><b> Send Another
+                                    Payment</b></a></h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

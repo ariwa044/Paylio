@@ -1,0 +1,66 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="dashboard-section body-collapse">
+    <div class="overlay pt-120">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="content-wrapper">
+                        <div class="row">
+                            <div class="col-xl-6 col-lg-8 mx-auto text-center">
+                                <div class="single-box p-5">
+                                    <div class="icon-box mb-4">
+                                        <i class="fas fa-times-circle fa-4x text-danger"></i>
+                                    </div>
+
+                                    <h3 class="mb-3 text-danger">Withdrawal Failed</h3>
+                                    <p class="text-muted mb-4">We couldn't process your withdrawal request</p>
+
+                                    <div class="failure-details p-4 bg-light rounded mb-4">
+                                        <div class="row mb-3">
+                                            <div class="col-6 text-left"><strong>Amount:</strong></div>
+                                            <div class="col-6 text-right">${{ withdrawal.amount|floatformat:2 }}</div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-6 text-left"><strong>Transaction ID:</strong></div>
+                                            <div class="col-6 text-right text-muted">{{ withdrawal.transaction_id }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6 text-left"><strong>Status:</strong></div>
+                                            <div class="col-6 text-right"><span class="badge badge-danger">Failed</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="alert alert-danger">
+                                        <strong><i class="fas fa-exclamation-triangle"></i> Possible Reasons:</strong>
+                                        <ul class="text-left mt-2 mb-0">
+                                            <li>Insufficient account balance</li>
+                                            <li>Account restrictions</li>
+                                            <li>Invalid bank details</li>
+                                            <li>Technical error</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <a href="#" class="btn btn-primary mr-2">Try
+                                            Again</a>
+                                        <a href="{% url 'account:dashboard' %}" class="cmn-btn">Return to Dashboard</a>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <small class="text-muted">Need help? <a href="#">Contact Support</a></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

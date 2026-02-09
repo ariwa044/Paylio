@@ -1,0 +1,530 @@
+{% extends 'partials/dashboard-base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Inline Styles to ensure overrides work and Premium Design -->
+<style>
+    /* --- Layout & Wrapper --- */
+    .card-payment-wrapper {
+        max-width: 700px;
+        margin: 0 auto;
+        padding-bottom: 60px;
+    }
+
+    /* --- Visual Card Preview --- */
+    .credit-card-visual {
+        background: linear-gradient(135deg, #4743c9 0%, #0c266c 100%);
+        border-radius: 20px;
+        padding: 40px;
+        color: #fff;
+        margin-bottom: 40px;
+        box-shadow: 0 20px 60px rgba(71, 67, 201, 0.25);
+        position: relative;
+        min-height: 250px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .credit-card-visual:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 70px rgba(71, 67, 201, 0.35);
+    }
+
+    .credit-card-visual::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0; 
+        left: 0;
+        background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.15) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    .marketing-chip {
+        width: 50px;
+        height: 40px;
+        background: linear-gradient(135deg, #ffd700 0%, #fdb931 100%);
+        border-radius: 6px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+
+    .card-brand-logo {
+        font-size: 40px;
+        opacity: 0.9;
+        line-height: 1;
+    }
+
+    .card-number-large {
+        font-family: 'Courier New', monospace;
+        font-size: 28px;
+        letter-spacing: 3px;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        margin-top: 20px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .card-meta-labels {
+        font-size: 11px;
+        text-transform: uppercase;
+        opacity: 0.7;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+        font-weight: 600;
+    }
+
+    .card-meta-values {
+        font-size: 16px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+
+    /* --- Form Styling --- */
+    .form-group-custom {
+        margin-bottom: 24px;
+        position: relative;
+    }
+
+    .form-label-custom {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .custom-input {
+        width: 100%;
+        height: 55px; /* Fixed height for consistency */
+        padding: 0 20px;
+        border: 2px solid #eef0f8;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 500;
+        color: #2c3e50;
+        background: #f9faff;
+        transition: all 0.2s ease;
+    }
+
+    .custom-input:focus {
+        border-color: #4743c9;
+        background: #fff;
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(71, 67, 201, 0.1);
+    }
+
+    .custom-input::placeholder {
+        color: #b0b8c1;
+    }
+
+    /* --- Nice Select Overrides --- */
+    /* Because the base template uses nice-select, we must style the generated div */
+    .nice-select {
+        width: 100% !important;
+        height: 55px !important;
+        line-height: 53px !important;
+        border: 2px solid #eef0f8 !important;
+        border-radius: 12px !important;
+        background-color: #f9faff !important;
+        padding-left: 20px !important;
+        float: none !important;
+    }
+    
+    .nice-select:active, .nice-select.open, .nice-select:focus {
+        border-color: #4743c9 !important;
+    }
+
+    .nice-select .current {
+        font-size: 16px;
+        font-weight: 500;
+        color: #2c3e50;
+    }
+
+    .nice-select .list {
+        width: 100% !important;
+        border-radius: 12px !important;
+        margin-top: 5px !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+        border: 1px solid #eef0f8 !important;
+    }
+
+    /* --- Input Adornments --- */
+    .amount-input-container {
+        position: relative;
+    }
+
+    .currency-symbol {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 18px;
+        font-weight: 600;
+        color: #4743c9;
+    }
+    
+    .amount-input-container .custom-input {
+        padding-left: 45px;
+        font-size: 20px;
+        font-weight: 700;
+        color: #4743c9;
+    }
+
+    /* --- Button --- */
+    .btn-submit-premium {
+        display: block;
+        width: 100%;
+        padding: 18px;
+        margin-top: 10px;
+        background: linear-gradient(135deg, #4743c9 0%, #0c266c 100%);
+        color: #fff;
+        font-size: 18px;
+        font-weight: 700;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        box-shadow: 0 10px 20px rgba(71, 67, 201, 0.2);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-submit-premium:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(71, 67, 201, 0.35);
+        color: #fff;
+    }
+
+    .section-divider {
+        height: 1px;
+        background: #eef0f8;
+        margin: 30px 0;
+    }
+    
+    .text-center-formatted {
+        text-align: center;
+    }
+</style>
+
+<section class="dashboard-section body-collapse pay step">
+    <div class="overlay pt-120">
+        <div class="container-fruid">
+            <div class="main-content">
+                
+                <div class="card-payment-wrapper">
+                    <!-- Header -->
+                    <div class="head-area d-flex align-items-center justify-content-between mb-5">
+                        <h4 class="title">Add New Card for Deposit</h4>
+                        <div class="icon-area">
+                            <img src="{% static 'assets1/images/icon/support-icon.png' %}" alt="Support">
+                        </div>
+                    </div>
+
+                    <!-- Visual Card Preview -->
+                    <div class="credit-card-visual" id="cardVisual">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="marketing-chip"></div>
+                            <div class="card-brand-logo" id="cardLogo">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                        </div>
+
+                        <div class="card-number-large" id="cardNumberDisplay">
+                            •••• •••• •••• ••••
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-end mt-4">
+                            <div>
+                                <div class="card-meta-labels">Card Holder</div>
+                                <div class="card-meta-values" id="cardHolderDisplay">YOUR NAME</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="card-meta-labels">Expires</div>
+                                <div class="card-meta-values" id="cardExpiryDisplay">MM/YY</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form -->
+                    <form action="{% url 'core:card-deposit' %}" method="POST" id="cardPaymentForm" autocomplete="off">
+                        {% csrf_token %}
+
+                        <!-- Card Details Group -->
+                        <div class="row">
+                            <div class="col-lg-5">
+                                <div class="form-group-custom">
+                                    <label class="form-label-custom">Card Brand</label>
+                                    <select name="card_type" id="cardType" class="nice-select wide" required>
+                                        <option value="" disabled selected>Select Brand</option>
+                                        <option value="visa">Visa</option>
+                                        <option value="master">Mastercard</option>
+                                        <option value="amex">Amex</option>
+                                        <option value="discover">Discover</option>
+                                        <option value="verve">Verve</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-7">
+                                <div class="form-group-custom">
+                                    <label class="form-label-custom">Card Number</label>
+                                    <input type="text" name="card_number" id="cardNumber" class="custom-input" 
+                                           placeholder="0000 0000 0000 0000" maxlength="19" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Name -->
+                        <div class="form-group-custom">
+                            <label class="form-label-custom">Cardholder Name</label>
+                            <input type="text" name="card_holder" id="cardHolder" class="custom-input" 
+                                   placeholder="Name on Card" required>
+                        </div>
+
+                        <!-- Expiry & CVV -->
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label class="form-label-custom">Expiry Date</label>
+                                <div class="row gx-2">
+                                    <div class="col-6">
+                                        <div class="form-group-custom">
+                                            <input type="text" name="expiry_month" id="expiryMonth" class="custom-input text-center-formatted" 
+                                                   placeholder="MM" maxlength="2" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group-custom">
+                                            <input type="text" name="expiry_year" id="expiryYear" class="custom-input text-center-formatted" 
+                                                   placeholder="YY" maxlength="2" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group-custom">
+                                    <label class="form-label-custom">CVV / CVC</label>
+                                    <input type="password" name="cvv" id="cvv" class="custom-input text-center-formatted" 
+                                           placeholder="123" maxlength="4" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-divider"></div>
+                        <h5 class="mb-4" style="font-size: 18px; color: #0c266c;">Billing Address</h5>
+
+                        <div class="form-group-custom">
+                            <label class="form-label-custom">Address Line 1</label>
+                            <input type="text" name="address_line1" class="custom-input" placeholder="Street Address" required>
+                        </div>
+
+                        <div class="form-group-custom">
+                            <label class="form-label-custom">Address Line 2 (Optional)</label>
+                            <input type="text" name="address_line2" class="custom-input" placeholder="Apartment, Suite, Unit">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group-custom">
+                                    <label class="form-label-custom">City</label>
+                                    <input type="text" name="city" class="custom-input" required>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group-custom">
+                                    <label class="form-label-custom">State / Province</label>
+                                    <input type="text" name="state" class="custom-input" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group-custom">
+                                    <label class="form-label-custom">Zip / Postal Code</label>
+                                    <input type="text" name="zip_code" class="custom-input" required>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group-custom">
+                                    <label class="form-label-custom">Country</label>
+                                    <input type="text" name="country" class="custom-input" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pb-5">
+                            <button type="submit" class="btn-submit-premium">
+                                Save Card & Continue <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                            <div class="text-center mt-3">
+                                <a href="{% url 'core:initiate-deposit' %}" class="text-muted" style="font-size: 14px; text-decoration: none;">
+                                    Cancel and return to methods
+                                </a>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SCRIPTS moved inside content block because base template lacks 'scripts' block -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Card Payment Script Loaded");
+
+        // Elements
+        const cardNumber = document.getElementById('cardNumber');
+        const cardHolder = document.getElementById('cardHolder');
+        const expiryMonth = document.getElementById('expiryMonth');
+        const expiryYear = document.getElementById('expiryYear');
+        const cardVisual = document.getElementById('cardVisual');
+        const cardLogo = document.getElementById('cardLogo');
+        const cardNumberDisplay = document.getElementById('cardNumberDisplay');
+        const cardHolderDisplay = document.getElementById('cardHolderDisplay');
+        const cardExpiryDisplay = document.getElementById('cardExpiryDisplay');
+        
+        // Handle Nice Select for Card Type
+        // Since nice-select hides the real select, we listen to the change on proper select
+        // but nice-select updates it.
+        // We can also try to listen to the click on the list items if needed, 
+        // but standard 'change' event usually bubbles from nice-select updates.
+        const cardTypeSelect = document.getElementById('cardType');
+        
+        // Brand Styles
+        const brands = {
+            visa: { icon: 'fab fa-cc-visa', color: 'linear-gradient(135deg, #1A1F71 0%, #29318C 100%)' },
+            master: { icon: 'fab fa-cc-mastercard', color: 'linear-gradient(135deg, #EB001B 0%, #F79E1B 100%)' },
+            amex: { icon: 'fab fa-cc-amex', color: 'linear-gradient(135deg, #006FCF 0%, #004687 100%)' },
+            discover: { icon: 'fab fa-cc-discover', color: 'linear-gradient(135deg, #FF6000 0%, #FF9D00 100%)' },
+            verve: { icon: 'fas fa-credit-card', color: 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)' },
+            default: { icon: 'fas fa-credit-card', color: 'linear-gradient(135deg, #4743c9 0%, #0c266c 100%)' }
+        };
+
+        const patterns = {
+            visa: /^4/,
+            master: /^(5[1-5]|2[2-7])/,
+            amex: /^3[47]/,
+            discover: /^(6011|65|64[4-9])/,
+            verve: /^(506|507|650)/
+        };
+
+        function updateBrand(type) {
+            const brand = brands[type] || brands.default;
+            cardLogo.innerHTML = `<i class="${brand.icon}"></i>`;
+            cardVisual.style.background = brand.color;
+        }
+
+        // --- Card Number Formatting (The "4 Digit Thing") ---
+        cardNumber.addEventListener('input', function(e) {
+            // 1. Strip all non-digits
+            let rawValue = e.target.value.replace(/\D/g, '');
+            
+            // 2. Limit to 16 digits
+            if (rawValue.length > 16) rawValue = rawValue.substring(0, 16);
+            
+            // 3. Add spaces every 4 digits
+            // Using regex: matches groups of 4 digits and joins them with space
+            let formattedValue = rawValue.match(/.{1,4}/g)?.join(' ') || '';
+            
+            // 4. Update Input Value
+            e.target.value = formattedValue;
+            
+            // 5. Update Visual Display
+            if (formattedValue) {
+                cardNumberDisplay.textContent = formattedValue;
+            } else {
+                cardNumberDisplay.textContent = '•••• •••• •••• ••••';
+            }
+
+            // 6. Auto-detect Brand
+            let detectedType = null;
+            for (const [key, regex] of Object.entries(patterns)) {
+                if (regex.test(rawValue)) {
+                    detectedType = key;
+                    break;
+                }
+            }
+
+            if (detectedType) {
+                // Update select box programmatically
+                cardTypeSelect.value = detectedType;
+                // Update nice-select UI if it exists
+                if ($ && $.fn.niceSelect) {
+                    $('#cardType').niceSelect('update');
+                }
+                updateBrand(detectedType);
+            }
+        });
+
+        // --- Other Inputs ---
+        cardHolder.addEventListener('input', (e) => {
+            cardHolderDisplay.textContent = e.target.value.toUpperCase() || 'YOUR NAME';
+        });
+
+        const updateExpiry = () => {
+             const m = expiryMonth.value || 'MM';
+             const y = expiryYear.value || 'YY';
+             cardExpiryDisplay.textContent = `${m}/${y}`;
+        };
+
+        expiryYear.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\D/g, '').substring(0,2);
+            updateExpiry();
+            validateExpiry();
+        });
+
+        expiryMonth.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\D/g, '').substring(0,2);
+            updateExpiry();
+            if(e.target.value.length === 2) expiryYear.focus();
+            validateExpiry();
+        });
+
+        function validateExpiry() {
+            const month = parseInt(expiryMonth.value);
+            const year = parseInt(expiryYear.value);
+            const currentYear = new Date().getFullYear() % 100; // Last 2 digits
+            const currentMonth = new Date().getMonth() + 1;
+
+            if (month && year) {
+                // Check if date is in the past
+                if (year < currentYear || (year === currentYear && month < currentMonth)) {
+                    expiryMonth.style.borderColor = '#dc3545';
+                    expiryYear.style.borderColor = '#dc3545';
+                    // Optional: Disable submit button or show error
+                } else {
+                    // Valid
+                    if (month > 12) {
+                         expiryMonth.style.borderColor = '#dc3545'; // Invalid month
+                    } else {
+                        expiryMonth.style.borderColor = '#eef0f8'; // Reset to default
+                        expiryYear.style.borderColor = '#eef0f8'; // Reset to default
+                    }
+                }
+            }
+        }
+
+        // Manual Brand Change
+        // Use jQuery change event because nice-select triggers that
+        if (window.jQuery) {
+            $('#cardType').on('change', function() {
+                updateBrand(this.value);
+            });
+        } else {
+            cardTypeSelect.addEventListener('change', function() {
+                updateBrand(this.value);
+            });
+        }
+    });
+</script>
+{% endblock content %}

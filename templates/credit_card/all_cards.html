@@ -1,0 +1,261 @@
+{% extends 'partials/dashboard-base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 30px;
+        padding: 20px 0;
+    }
+    
+    .saved-card {
+        position: relative;
+        border-radius: 20px;
+        padding: 30px;
+        color: #fff;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .saved-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+    }
+    
+    .saved-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.15) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    
+    /* Card Type Gradients */
+    .saved-card.visa { background: linear-gradient(135deg, #1A1F71 0%, #29318C 100%); }
+    .saved-card.master { background: linear-gradient(135deg, #EB001B 0%, #F79E1B 100%); }
+    .saved-card.amex { background: linear-gradient(135deg, #006FCF 0%, #004687 100%); }
+    .saved-card.discover { background: linear-gradient(135deg, #FF6000 0%, #FF9D00 100%); }
+    .saved-card.verve { background: linear-gradient(135deg, #00A859 0%, #006A3B 100%); }
+    .saved-card.default { background: linear-gradient(135deg, #4743c9 0%, #0c266c 100%); }
+    
+    .card-brand {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    
+    .card-brand .chip {
+        width: 45px;
+        height: 35px;
+        background: linear-gradient(135deg, #ffd700 0%, #fdb931 100%);
+        border-radius: 6px;
+    }
+    
+    .card-brand .logo {
+        font-size: 36px;
+        opacity: 0.9;
+    }
+    
+    .card-number-display {
+        font-family: 'Courier New', monospace;
+        font-size: 22px;
+        letter-spacing: 2px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        margin: 20px 0;
+    }
+    
+    .card-details {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+    
+    .card-holder-name {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.9;
+    }
+    
+    .card-expiry {
+        text-align: right;
+    }
+    
+    .card-expiry .label {
+        font-size: 10px;
+        text-transform: uppercase;
+        opacity: 0.7;
+    }
+    
+    .card-expiry .value {
+        font-size: 16px;
+        font-weight: 600;
+    }
+    
+    .card-actions {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        display: flex;
+        gap: 10px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    .saved-card:hover .card-actions {
+        opacity: 1;
+    }
+    
+    .card-actions a, .card-actions button {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.2);
+        backdrop-filter: blur(10px);
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        transition: background 0.2s;
+        text-decoration: none;
+    }
+    
+    .card-actions a:hover, .card-actions button:hover {
+        background: rgba(255,255,255,0.4);
+    }
+    
+    .card-actions .delete-btn:hover {
+        background: rgba(220,53,69,0.8);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: #f9faff;
+        border-radius: 20px;
+    }
+    
+    .empty-state i {
+        font-size: 64px;
+        color: #dee2e6;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state h5 {
+        color: #6c757d;
+        margin-bottom: 10px;
+    }
+    
+    .empty-state p {
+        color: #adb5bd;
+        margin-bottom: 25px;
+    }
+    
+    .btn-add-card {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 15px 30px;
+        background: linear-gradient(135deg, #4743c9 0%, #0c266c 100%);
+        color: #fff;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .btn-add-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(71, 67, 201, 0.3);
+        color: #fff;
+    }
+</style>
+
+<section class="dashboard-section body-collapse pay step">
+    <div class="overlay pt-120">
+        <div class="container-fruid">
+            <div class="main-content">
+                <div class="head-area d-flex align-items-center justify-content-between mb-5">
+                    <div>
+                        <h4 class="title">My Saved Cards</h4>
+                        <p class="text-muted">Manage your saved payment methods</p>
+                    </div>
+                    <a href="{% url 'account:dashboard' %}" class="btn-add-card">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+                
+                {% if cards %}
+                <div class="cards-grid">
+                    {% for card in cards %}
+                    <div class="saved-card {{ card.card_type }}">
+                        <div class="card-actions">
+                            <a href="{% url 'core:deposit-with-saved-card' card.card_id %}" title="Use for Deposit">
+                                <i class="fas fa-plus"></i>
+                            </a>
+                            <form action="{% url 'core:delete-card' card.card_id %}" method="POST" style="margin:0;" onsubmit="return confirm('Delete this card?');">
+                                {% csrf_token %}
+                                <button type="submit" class="delete-btn" title="Delete Card">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div class="card-brand">
+                            <div class="chip"></div>
+                            <div class="logo">
+                                {% if card.card_type == 'visa' %}
+                                <i class="fab fa-cc-visa"></i>
+                                {% elif card.card_type == 'master' %}
+                                <i class="fab fa-cc-mastercard"></i>
+                                {% elif card.card_type == 'amex' %}
+                                <i class="fab fa-cc-amex"></i>
+                                {% elif card.card_type == 'discover' %}
+                                <i class="fab fa-cc-discover"></i>
+                                {% else %}
+                                <i class="fas fa-credit-card"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="card-number-display">
+                            {{ card.masked_number }}
+                        </div>
+                        
+                        <div class="card-details">
+                            <div class="card-holder-name">{{ card.name }}</div>
+                            <div class="card-expiry">
+                                <div class="label">Expires</div>
+                                <div class="value">{{ card.expiry_display }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="far fa-credit-card"></i>
+                    <h5>No Saved Cards</h5>
+                    <p>You haven't added any payment cards yet.</p>
+                    <a href="{% url 'account:dashboard' %}" class="btn-add-card">
+                        <i class="fas fa-plus"></i> Add Your First Card
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

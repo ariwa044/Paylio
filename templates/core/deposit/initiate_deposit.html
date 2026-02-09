@@ -1,0 +1,222 @@
+{% extends 'partials/dashboard-base.html' %}
+{% load static %}
+
+{% block styles %}
+<style>
+    .deposit-box {
+        background: #fff;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .deposit-box .title {
+        color: #2e2e2e;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .deposit-form .form-group {
+        margin-bottom: 25px;
+    }
+
+    .deposit-form label.mdr {
+        font-size: 15px;
+        font-weight: 500;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .deposit-form .form-control,
+    .deposit-form .form-select {
+        border: 1.5px solid #e9ecef;
+        border-radius: 8px;
+        padding: 12px 15px;
+        height: auto;
+        font-size: 15px;
+    }
+
+    .deposit-form .form-control:focus,
+    .deposit-form .form-select:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+
+    .deposit-amount .input-group-text {
+        background: #f8f9fa;
+        border: 1.5px solid #e9ecef;
+        border-right: none;
+        font-size: 18px;
+        color: #495057;
+    }
+
+    .deposit-amount .form-control {
+        border-left: none;
+    }
+
+    .exchange-rate .badge {
+        font-size: 14px;
+        padding: 8px 12px;
+        border-radius: 6px;
+    }
+
+    .crypto-info .card {
+        border-radius: 8px;
+    }
+
+    .crypto-info .card-body {
+        padding: 15px;
+    }
+
+    .cmn-btn {
+        padding: 15px 30px;
+        font-size: 16px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .cmn-btn:hover {
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="dashboard-section body-collapse">
+    <div class="overlay pt-120">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xl-8 col-lg-8">
+                    <div class="section-content">
+                        <div class="deposit-box">
+                            <div class="section-header">
+                                <h5 class="title">Deposit Money</h5>
+                                <p class="text-muted">Choose your preferred deposit method below</p>
+                            </div>
+                            {% include 'partials/messages.html' %}
+                            <form action="" method="POST" class="deposit-form">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-12 mb-4">
+                                    <div class="form-group deposit-amount">
+                                        <label for="amount" class="mdr">Amount to Deposit</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control form-control-lg" name="amount" id="amount" 
+                                                   placeholder="Enter amount" required min="1" step="0.01">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 mb-4">
+                                    <div class="form-group deposit-method">
+                                        <label for="deposit_method" class="mdr">Deposit Method</label>
+                                        <select class="form-select form-select-lg" name="deposit_method" id="deposit_method" required>
+                                            <option value="">Select deposit method</option>
+                                            {% for method_id, method_name in deposit_methods %}
+                                            <option value="{{ method_id }}">{{ method_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <!-- Crypto Currency Selection (hidden by default) -->
+                                <div class="col-12 mb-4" id="crypto_section" style="display: none;">
+                                    <div class="form-group crypto-select">
+                                        <label for="crypto_currency" class="mdr">Select Cryptocurrency</label>
+                                        {% if crypto_rates %}
+                                        <div class="exchange-rate mb-2">
+                                            <span class="badge bg-info text-white">Current Rate: ${{ crypto_rates }}</span>
+                                        </div>
+                                        {% endif %}
+                                        <select class="form-select form-select-lg" name="crypto_currency" id="crypto_currency">
+                                            <option value="">Select cryptocurrency</option>
+                                            {% for crypto_id, crypto_name in cryptocurrencies %}
+                                            <option value="{{ crypto_id }}">
+                                                {{ crypto_name }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="crypto-info mt-3" id="crypto_info" style="display: none;">
+                                            <div class="card bg-light border-0">
+                                                <div class="card-body">
+                                                    <h6 class="mb-2">Estimated USD Value: <span id="usd_value" class="text-success">$0.00</span></h6>
+                                                    <p class="text-muted small mb-0">Exchange rates are updated in real-time</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 mb-4">
+                                    <div class="form-group">
+                                        <label for="description" class="mdr">Description (Optional)</label>
+                                        <textarea class="form-control form-control-lg" name="description" id="description" 
+                                                  rows="3" placeholder="Enter deposit description"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <button type="submit" class="cmn-btn w-100 btn-lg">
+                                            <i class="fas fa-wallet me-2"></i>Continue to Deposit
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const depositMethod = document.getElementById('deposit_method');
+    const cryptoSection = document.getElementById('crypto_section');
+    const cryptoCurrency = document.getElementById('crypto_currency');
+    const cryptoInfo = document.getElementById('crypto_info');
+    const usdValue = document.getElementById('usd_value');
+    const amountInput = document.getElementById('amount');
+
+    // Show/hide crypto section based on deposit method
+    depositMethod.addEventListener('change', function() {
+        if (this.value === 'crypto_deposit') {
+            cryptoSection.style.display = 'block';
+            cryptoCurrency.required = true;
+        } else {
+            cryptoSection.style.display = 'none';
+            cryptoCurrency.required = false;
+        }
+    });
+
+    // Calculate USD value when amount or cryptocurrency changes
+    function updateUSDValue() {
+        if (depositMethod.value === 'crypto_deposit' && 
+            cryptoCurrency.value && 
+            amountInput.value) {
+            
+            const selectedOption = cryptoCurrency.options[cryptoCurrency.selectedIndex];
+            const rate = parseFloat(selectedOption.dataset.rate);
+            
+            if (!isNaN(rate)) {
+                const amount = parseFloat(amountInput.value);
+                if (!isNaN(amount)) {
+                    const usdAmount = (amount * rate).toFixed(2);
+                    usdValue.textContent = `$${usdAmount}`;
+                    cryptoInfo.style.display = 'block';
+                    return;
+                }
+            }
+        }
+        cryptoInfo.style.display = 'none';
+    }
+
+    amountInput.addEventListener('input', updateUSDValue);
+    cryptoCurrency.addEventListener('change', updateUSDValue);
+});
+</script>
+{% endblock %}

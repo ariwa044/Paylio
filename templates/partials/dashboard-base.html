@@ -11,7 +11,8 @@
 
     <link rel="shortcut icon" href="{% static 'assets11/images/fav.png' %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'assets1/css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'assets1/css/fontawesome.min.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- <link rel="stylesheet" href="{% static 'assets1/css/fontawesome.min.css' %}"> -->
     <link rel="stylesheet" href="{% static 'assets1/css/jquery-ui.css' %}">
     <link rel="stylesheet" href="{% static 'assets1/css/plugin/apexcharts.css' %}">
     <link rel="stylesheet" href="{% static 'assets1/css/plugin/nice-select.css' %}">
@@ -21,7 +22,7 @@
 </head>
 
 <body>
-     
+
     <!-- start preloader -->
     <div class="preloader" id="preloader"></div>
     <!-- end preloader -->
@@ -40,43 +41,30 @@
                             <img src="{% static 'assets1/images/icon/menu.png' %}" alt="icon">
 
                         </div>
-                        <form action="#" class="flex-fill">
-                            <div class="form-group d-flex align-items-center">
-                                <img src="{% static 'assets1/images/icon/search.png' %}" alt="icon">
-                                <input type="text" placeholder="Type to search...">
-                            </div>
-                        </form>
+                        <div class="flex-fill d-flex align-items-center justify-content-center">
+                            <a href="{% url 'account:dashboard' %}" class="d-flex align-items-center text-decoration-none">
+                                <img src="{% static 'assets1/images/logo.png' %}" alt="Paylio" style="height: 35px;">
+                            </a>
+                        </div>
                         <div class="dashboard-nav">
-                            <div class="single-item language-area">
-                                <div class="language-btn">
-                                    <img src="{% static 'assets1/images/icon/bell.png' %}" alt="icon">
-                                </div>
-                                <ul class="main-area language-content">
-                                    <li>English</li>
-                                    <li>Hindi</li>
-                                    <li class="active">English (US)</li>
-                                    <li>Japanese</li>
-                                    <li>Kannada</li>
-                                    <li>Lithuanian</li>
-                                </ul>
-                            </div>
+
                             <div class="single-item notifications-area">
-                                <div class="notifications-btn">
+                                <a href="javascript:void(0)" class="notifications-btn">
                                     <img src="{% static 'assets1/images/icon/bell.png' %}" class="bell-icon" alt="icon">
-                                </div>
+                                </a>
                                 <div class="main-area notifications-content">
                                     <div class="head-area d-flex justify-content-between">
                                         <h5>Notifications</h5>
-                                        <span class="mdr">{{ notifications.count }}</span>
-
                                     </div>
-                                    <ul>
+                                    <ul style="max-height: 400px; overflow-y: auto;">
                                         {% for n in notifications %}
                                         <li>
-                                            
-                                            <a href="javascript:void(0)" class="d-flex">
+                                            <a href="javascript:void(0)" class="d-flex align-items-center">
+                                                {% if not n.is_read %}
+                                                <span class="unread-dot"
+                                                    style="height: 10px; width: 10px; background-color: #0d6efd; border-radius: 50%; display: inline-block; margin-right: 10px; flex-shrink: 0;"></span>
+                                                {% endif %}
                                                 <div class="text-area">
-                                                    
                                                     {% if n.notification_type == "Credit Alert" %}
                                                     <p class="mdr">You received a payment of <b>${{n.amount}}</b></p>
                                                     {% endif %}
@@ -84,31 +72,37 @@
                                                     <p class="mdr">You sent a payment of <b>${{n.amount}}</b></p>
                                                     {% endif %}
                                                     {% if n.notification_type == "Sent Payment Request" %}
-                                                    <p class="mdr">You sent a <b>payment request</b> of <b>${{n.amount}}</b></p>
+                                                    <p class="mdr">You sent a <b>payment request</b> of
+                                                        <b>${{n.amount}}</b>
+                                                    </p>
                                                     {% endif %}
                                                     {% if n.notification_type == "Recieved Payment Request" %}
-                                                    <p class="mdr">You received a <b>payment request</b> of <b>${{n.amount}}</b></p>
+                                                    <p class="mdr">You received a <b>payment request</b> of
+                                                        <b>${{n.amount}}</b>
+                                                    </p>
                                                     {% endif %}
                                                     {% if n.notification_type == "Funded Credit Card" %}
-                                                    <p class="mdr">You funded your credit card with <b>${{n.amount}}</b></p>
+                                                    <p class="mdr">You funded your credit card with <b>${{n.amount}}</b>
+                                                    </p>
                                                     {% endif %}
                                                     {% if n.notification_type == "Withdrew Credit Card Funds" %}
-                                                    <p class="mdr">You withdrew <b>${{n.amount}}</b> from your credit card</p>
+                                                    <p class="mdr">You withdrew <b>${{n.amount}}</b> from your credit
+                                                        card</p>
                                                     {% endif %}
                                                     {% if n.notification_type == "Deleted Credit Card" %}
                                                     <p class="mdr">You deleted your credit card</p>
                                                     {% endif %}
                                                     {% if n.notification_type == "Added Credit Card" %}
-                                                    <p class="mdr">You added a new  credit card</p>
+                                                    <p class="mdr">You added a new credit card</p>
                                                     {% endif %}
-                                                        
-                                                    <p class="mdr time-area">{{n.date}}</p>
+                                                    <p class="mdr time-area">{{n.date|timesince}} ago</p>
                                                 </div>
                                             </a>
                                             <i class="fa-solid fa-caret-right"></i>
                                         </li>
+                                        {% empty %}
+                                        <li class="p-3 text-center">No notifications</li>
                                         {% endfor %}
-
                                     </ul>
                                 </div>
                             </div>
@@ -116,43 +110,71 @@
                                 <div class="profile-area d-flex align-items-center">
                                     <span class="user-profile">
                                         {% if request.user.kyc.image.url %}
-                                            <img style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;" src="{{ request.user.kyc.image.url }}" alt="image">
+                                        <img style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;"
+                                            src="{{ request.user.kyc.image.url }}" alt="image">
                                         {% else %}
-                                            <img src="{% static 'assets1/images/default.jpg' %}"  style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" alt="">
-                                        {% endif %}                                    
+                                        <img src="{% static 'assets1/images/default.jpg' %}"
+                                            style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;"
+                                            alt="">
+                                        {% endif %}
                                     </span>
                                     <i class="fa-solid fa-sort-down"></i>
                                 </div>
-                                <div class="main-area user-content">
-                                    <div class="head-area d-flex align-items-center">
-                                        <div class="profile-img">
-                                            <!-- <img src="{% static 'assets1/images/avatar-2.png' %}" alt="User"> -->
-                                            
+                                <div class="main-area user-content"
+                                    style="min-width: 280px; padding: 20px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);">
+                                    <div class="head-area d-flex align-items-center"
+                                        style="padding-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.1); margin-bottom: 15px;">
+                                        <div class="profile-img" style="margin-right: 15px;">
                                             {% if request.user.kyc.image.url %}
-                                            <img style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;" src="{{ request.user.kyc.image.url }}" alt="image">
+                                            <img style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 3px solid #6c5ce7;"
+                                                src="{{ request.user.kyc.image.url }}" alt="Profile Picture">
                                             {% else %}
-                                            <img src="{% static 'assets1/images/default.jpg' %}"  style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" alt="">
+                                            <img src="{% static 'assets1/images/default.jpg' %}"
+                                                style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 3px solid #6c5ce7;"
+                                                alt="Default Profile">
                                             {% endif %}
-                                                
-
                                         </div>
                                         <div class="profile-head">
-                                            <a href="{% url 'account:account' %}">
-                                                <h5>{{kyc.full_name|title}}</h5>
+                                            <a href="{% url 'account:account' %}" style="text-decoration: none;">
+                                                <h5
+                                                    style="margin: 0 0 5px 0; font-size: 16px; font-weight: 600; color: #2d3436;">
+                                                    {{kyc.full_name|title}}</h5>
                                             </a>
-                                            <p class="wallet-id"><small>Account No. {{ request.user.account.account_number }}</small></p>
-                                            <p class="wallet-id"><small>Pin No. {{ request.user.account.pin_number }}</small></p>
+                                            <p class="wallet-id" style="margin: 0; font-size: 12px; color: #636e72;">
+                                                <i class="fas fa-wallet" style="margin-right: 5px;"></i>{{ request.user.account.account_number }}
+                                            </p>
                                         </div>
                                     </div>
-                                    <ul>
-                                        <li class="border-area">
-                                            <a href="{% url 'account:dashboard' %}"><i class="fas fa-user"></i>Dashboard</a>
+                                    <ul style="list-style: none; padding: 0; margin: 0;">
+                                        <li style="margin-bottom: 8px;">
+                                            <a href="{% url 'account:dashboard' %}"
+                                                style="display: flex; align-items: center; padding: 10px 12px; border-radius: 8px; text-decoration: none; color: #2d3436; transition: background 0.2s;">
+                                                <i class="fas fa-home"
+                                                    style="width: 20px; margin-right: 12px; color: #6c5ce7;"></i>Dashboard
+                                            </a>
                                         </li>
-                                        <li class="border-area">
-                                            <a href="javascript:void(0)"><i class="fas fa-cog"></i>Settings</a>
+                                        <li style="margin-bottom: 8px;">
+                                            <a href="{% url 'account:account' %}"
+                                                style="display: flex; align-items: center; padding: 10px 12px; border-radius: 8px; text-decoration: none; color: #2d3436; transition: background 0.2s;">
+                                                <i class="fas fa-user"
+                                                    style="width: 20px; margin-right: 12px; color: #6c5ce7;"></i>My
+                                                Account
+                                            </a>
                                         </li>
-                                        <li>
-                                            <a href="{% url 'userauths:sign-out' %}"><i class="fas fa-sign-out"></i>Logout</a>
+                                        <li style="margin-bottom: 8px;">
+                                            <a href="{% url 'account:pin-settings' %}"
+                                                style="display: flex; align-items: center; padding: 10px 12px; border-radius: 8px; text-decoration: none; color: #2d3436; transition: background 0.2s;">
+                                                <i class="fas fa-cog"
+                                                    style="width: 20px; margin-right: 12px; color: #6c5ce7;"></i>Settings
+                                            </a>
+                                        </li>
+                                        <li
+                                            style="border-top: 1px solid rgba(0,0,0,0.1); padding-top: 10px; margin-top: 5px;">
+                                            <a href="{% url 'userauths:sign-out' %}"
+                                                style="display: flex; align-items: center; padding: 10px 12px; border-radius: 8px; text-decoration: none; color: #d63031; transition: background 0.2s;">
+                                                <i class="fas fa-sign-out-alt"
+                                                    style="width: 20px; margin-right: 12px;"></i>Logout
+                                            </a>
                                         </li>
                                     </ul>
                                 </div>
@@ -164,69 +186,65 @@
                             <i class="fa-solid fa-xmark"></i>
                         </div>
                         <div class="sidebar-logo">
-                            <a href="dashboard.html"><img src="{% static 'assets1/images/logo.png' %}" alt="logo"></a>
+                            <a href="{% url 'account:dashboard' %}"><img src="{% static 'assets1/images/logo.png' %}" alt="logo"></a>
                         </div>
                         <ul>
                             <li>
                                 <a href="{% url 'account:dashboard' %}">
-                                    <img src="{% static 'assets1/images/icon/dashboard.png' %}" alt="Dashboard"> <span>Dashboard</span>
+                                    <img src="{% static 'assets1/images/icon/dashboard.png' %}" alt="Dashboard">
+                                    <span>Dashboard</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="{% url 'core:transaction-list' %}">
-                                    <img src="{% static 'assets1/images/icon/transactions.png' %}" alt="Transactions"> <span>Transactions</span>
+                                    <img src="{% static 'assets1/images/icon/transactions.png' %}" alt="Transactions">
+                                    <span>Transactions</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="{% url 'core:search-account' %}">
-                                    <img src="{% static 'assets1/images/icon/pay.png' %}" alt="Pay"> <span>Pay</span>
+                                <a href="{% url 'core:transfer-selection' %}">
+                                    <img src="{% static 'assets1/images/icon/pay.png' %}" alt="Pay"> <span>Transfer
+                                        Money</span>
                                 </a>
                             </li>
-                            <li>
+                            <!-- <li>
                                 <a href="{% url 'core:request-search-user' %}">
-                                    <img src="{% static 'assets1/images/icon/receive.png' %}" alt="Receive"> <span>Receive</span>
+                                    <img src="{% static 'assets1/images/icon/receive.png' %}" alt="Receive">
+                                    <span>Payment Request</span>
                                 </a>
-                            </li>
+                            </li> -->
                             <li>
-                                <a href="money-exchange.html">
-                                    <img src="{% static 'assets1/images/icon/exchange.png' %}" alt="Exchange"> <span>Exchange</span>
+                                <a href="{% url 'core:initiate-deposit' %}">
+                                    <img src="{% static 'assets1/images/icon/deposit.png' %}" alt="Deposit">
+                                    <span>Deposit Money</span>
                                 </a>
                             </li>
-                            <li>
-                                <a href="recipients.html">
-                                    <img src="{% static 'assets1/images/icon/recipients.png' %}" alt="Recipients"> <span>Recipients</span>
+                            <!-- <li>
+                                <a href="#">
+                                    <img src="{% static 'assets1/images/icon/withdraw.png' %}" alt="Withdraw">
+                                    <span>Withdraw Money</span>
                                 </a>
-                            </li>
-                            <li>
-                                <a href="crypto.html">
-                                    <img src="{% static 'assets1/images/icon/crypto.png' %}" alt="Crypto"> <span>Crypto</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="deposit-money.html">
-                                    <img src="{% static 'assets1/images/icon/deposit.png' %}" alt="Deposit"> <span>Deposit Money</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="withdraw-money-step-1.html">
-                                    <img src="{% static 'assets1/images/icon/withdraw.png' %}" alt="Withdraw"> <span>Withdraw Money</span>
-                                </a>
-                            </li>
+                            </li> -->
+
                         </ul>
                         <ul class="bottom-item">
+
                             <li class="active">
                                 <a href="{% url 'account:account' %}">
-                                    <img src="{% static 'assets1/images/icon/account.png' %}" alt="Account"> <span>Account</span>
+                                    <img src="{% static 'assets1/images/icon/account.png' %}" alt="Account">
+                                    <span>Account</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="javascript:void(0)">
-                                    <img src="{% static 'assets1/images/icon/support.png' %}" alt="Support"> <span>Support</span>
+                                    <img src="{% static 'assets1/images/icon/support.png' %}" alt="Support">
+                                    <span>Support</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="javascript:void(0)">
-                                    <img src="{% static 'assets1/images/icon/quit.png' %}" alt="Quit"> <span>Quit</span>
+                                <a href="{% url 'userauths:sign-out' %}">
+                                    <img src="{% static 'assets1/images/icon/quit.png' %}" alt="Quit">
+                                    <span>Logout</span>
                                 </a>
                             </li>
                         </ul>
@@ -242,30 +260,207 @@
                     </div>
                 </div>
                 <!-- alert start -->
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{message.tags}}">
-                            <strong>{{ message }}</strong>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-                <script>
-                    setTimeout (() => {
-                        $(".alert").alert("close");
-                    }, 4000)
-                </script>
+                <!-- alert start -->
+                <!-- Alerts moved to body top for fixed positioning -->
                 <!-- alert end -->
             </div>
         </div>
     </header>
-  
+
+    <!-- Notification Container -->
+    <div id="notification-container">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{message.tags}} slide-in-top">
+            <div class="icon-area">
+                {% if message.tags == 'success' %}
+                <i class="fas fa-check-circle"></i>
+                {% elif message.tags == 'warning' %}
+                <i class="fas fa-exclamation-circle"></i>
+                {% elif message.tags == 'error' %}
+                <i class="fas fa-times-circle"></i>
+                {% else %}
+                <i class="fas fa-info-circle"></i>
+                {% endif %}
+            </div>
+            <div class="text-area">
+                <strong>{{ message }}</strong>
+            </div>
+            <button type="button" class="close-btn" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.classList.add('slide-out-top');
+                    setTimeout(() => {
+                        alert.remove();
+                    }, 500); // Wait for animation
+                }, 5000); // 5 seconds display
+            });
+
+            // Mark notifications as read when dropdown closes
+            const notificationContent = document.querySelector('.notifications-content');
+            const notificationBtn = document.querySelector('.notifications-btn');
+
+            function markAllAsRead() {
+                fetch("{% url 'core:mark-all-notifications-read' %}", {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove red badges/dots
+                            const dots = document.querySelectorAll('.unread-dot');
+                            dots.forEach(dot => dot.remove());
+
+                            // Update/Remove badge on bell icon
+                            const badge = document.querySelector('.notifications-btn .badge');
+                            if (badge) badge.remove();
+                        }
+                    })
+                    .catch(error => console.error('Error marking notifications as read:', error));
+            }
+
+            document.addEventListener('click', function (e) {
+                // If notification dropdown IS open (active)
+                if (notificationContent.classList.contains('active')) {
+                    // And we click OUTSIDE the content
+                    if (!notificationContent.contains(e.target)) {
+                        // If we clicked the button, it will toggle (close), so we sync.
+                        // If we clicked elsewhere, it will close (via main.js), so we sync.
+                        // We can just trigger it.
+                        markAllAsRead();
+                    }
+                }
+            });
+        });
+    </script>
+
+    <style>
+        #notification-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .alert {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid;
+            color: #333;
+            margin: 0;
+            animation: slideInDown 0.5s ease-out forwards;
+        }
+
+        .alert-success {
+            border-color: #28a745;
+        }
+
+        .alert-success .icon-area i {
+            color: #28a745;
+        }
+
+        .alert-warning {
+            border-color: #ffc107;
+        }
+
+        .alert-warning .icon-area i {
+            color: #ffc107;
+        }
+
+        .alert-error {
+            border-color: #dc3545;
+        }
+
+        .alert-error .icon-area i {
+            color: #dc3545;
+        }
+
+        .alert-info {
+            border-color: #17a2b8;
+        }
+
+        .alert-info .icon-area i {
+            color: #17a2b8;
+        }
+
+        .alert .icon-area {
+            margin-right: 15px;
+            font-size: 20px;
+        }
+
+        .alert .text-area {
+            flex-grow: 1;
+            font-size: 14px;
+        }
+
+        .alert .close-btn {
+            background: none;
+            border: none;
+            font-size: 14px;
+            color: #999;
+            cursor: pointer;
+        }
+
+        @keyframes slideInDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutTop {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+        }
+
+        .slide-out-top {
+            animation: slideOutTop 0.5s ease-in forwards;
+        }
+    </style>
 
 
-{% block content %}
-  
-{% endblock content %}
 
-    
+    {% block content %}
+
+    {% endblock content %}
+
+
     <!--==================================================================-->
     <script src="{% static 'assets1/js/jquery.min.js' %}"></script>
     <script src="{% static 'assets1/js/bootstrap.min.js' %}"></script>

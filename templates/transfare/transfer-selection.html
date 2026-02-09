@@ -1,0 +1,45 @@
+{% extends 'partials/dashboard-base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="dashboard-section body-collapse pay step">
+    <div class="overlay pt-120">
+        <div class="container-fluid">
+            <div class="main-content">
+                <div class="head-area d-flex align-items-center justify-content-between mb-4">
+                    <h4>Transfer Money</h4>
+                    <div class="icon-area">
+                        <img src="{% static 'assets1/images/icon/support-icon.png' %}" alt="icon">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <a href="{% url 'core:search-account' %}"
+                            class="single-item d-block text-center p-5 bg-white rounded shadow-sm text-decoration-none">
+                            <div class="icon-area mb-3">
+                                <img src="{% static 'assets1/images/icon/account.png' %}" alt="Internal"
+                                    style="width: 60px;">
+                            </div>
+                            <h3>Internal Transfer</h3>
+                            <p class="text-muted mt-2">Transfer money to another Paylio user instantly.</p>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <a href="{% url 'core:search-external-account' %}"
+                            class="single-item d-block text-center p-5 bg-white rounded shadow-sm text-decoration-none">
+                            <div class="icon-area mb-3">
+                                <img src="{% static 'assets1/images/icon/pay.png' %}" alt="External"
+                                    style="width: 60px;">
+                            </div>
+                            <h3>External Transfer</h3>
+                            <p class="text-muted mt-2">Transfer money to an external bank account.</p>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

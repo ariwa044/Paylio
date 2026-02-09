@@ -1,0 +1,226 @@
+{% extends "partials/dashboard-base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<section class="dashboard-section body-collapse">
+    <div class="overlay pt-120">
+        <div class="container-fluid">
+            <!-- Header & Filters -->
+            <div class="row justify-content-between align-items-center mb-4">
+                <div class="col-lg-6">
+                    <div class="section-header">
+                        <h2 class="title">Transaction History</h2>
+                        <p>Track and manage your financial activity.</p>
+                    </div>
+                </div>
+                <!-- Filter Toggle (Mobile) or Quick Actions -->
+            </div>
+
+            <!-- Filter Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="filter-area p-4 bg-white rounded shadow-sm" style="border-radius: 15px;">
+                        <form method="GET" action="{% url 'core:transaction-list' %}" class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label text-muted small text-uppercase fw-bold">Search</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0"><i class="fas fa-search text-muted"></i></span>
+                                    <input type="text" name="search" class="form-control bg-light border-0" placeholder="ID, Amount..." value="{{ search_query|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted small text-uppercase fw-bold">Type</label>
+                                <select name="type" class="wide">
+                                    <option value="all">All Transactions</option>
+                                    <option value="deposit" {% if current_type == 'deposit' %}selected{% endif %}>Deposits</option>
+                                    <option value="transfer" {% if current_type == 'transfer' %}selected{% endif %}>Transfers</option>
+                                    <option value="withdraw" {% if current_type == 'withdraw' %}selected{% endif %}>Withdrawals</option>
+                                    <option value="request" {% if current_type == 'request' %}selected{% endif %}>Requests</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted small text-uppercase fw-bold">Status</label>
+                                <select name="status" class="wide">
+                                    <option value="all">Any Status</option>
+                                    <option value="completed" {% if current_status == 'completed' %}selected{% endif %}>Completed</option>
+                                    <option value="pending" {% if current_status == 'pending' %}selected{% endif %}>Pending</option>
+                                    <option value="processing" {% if current_status == 'processing' %}selected{% endif %}>Processing</option>
+                                    <option value="failed" {% if current_status == 'failed' %}selected{% endif %}>Failed</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100 fw-bold" style="background-color: #0c266c; border: none; padding: 10px;">
+                                    <i class="fas fa-filter me-2"></i> Apply Filters
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transactions List -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="table-responsive bg-white p-4 rounded shadow-sm" style="border-radius: 15px;">
+                        <table class="table table-hover align-middle">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="py-3 px-3 text-muted text-uppercase small fw-bold border-0">Transaction</th>
+                                    <th class="py-3 px-3 text-muted text-uppercase small fw-bold border-0">ID</th>
+                                    <th class="py-3 px-3 text-muted text-uppercase small fw-bold border-0">Date</th>
+                                    <th class="py-3 px-3 text-muted text-uppercase small fw-bold border-0">Amount</th>
+                                    <th class="py-3 px-3 text-muted text-uppercase small fw-bold border-0 text-center">Status</th>
+                                    <th class="py-3 px-3 text-muted text-uppercase small fw-bold border-0 text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in transactions %}
+                                <tr style="cursor: pointer;" onclick="window.location='{% url 'core:transaction-detail' transaction.transaction_id %}';">
+                                    <td class="py-3 px-3 border-bottom">
+                                        <div class="d-flex align-items-center">
+                                            <div class="icon-circle me-3 d-flex align-items-center justify-content-center" 
+                                                 style="width: 45px; height: 45px; border-radius: 50%; 
+                                                 background-color: {% if transaction.transaction_type == 'deposit' %}rgba(46, 204, 113, 0.1)
+                                                 {% elif transaction.transaction_type == 'withdraw' %}rgba(231, 76, 60, 0.1)
+                                                 {% elif transaction.transaction_type == 'transfer' %}rgba(52, 152, 219, 0.1)
+                                                 {% else %}rgba(241, 196, 15, 0.1){% endif %};">
+                                                
+                                                {% if transaction.transaction_type == 'deposit' %}
+                                                    <i class="fas fa-arrow-down" style="color: #2ecc71;"></i>
+                                                {% elif transaction.transaction_type == 'withdraw' %}
+                                                    <i class="fas fa-arrow-up" style="color: #e74c3c;"></i>
+                                                {% elif transaction.transaction_type == 'transfer' %}
+                                                    <i class="fas fa-exchange-alt" style="color: #3498db;"></i>
+                                                {% else %}
+                                                    <i class="fas fa-file-invoice-dollar" style="color: #f1c40f;"></i>
+                                                {% endif %}
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-bold text-dark">
+                                                    {{ transaction.transaction_type|title }}
+                                                </h6>
+                                                <small class="text-muted">
+                                                    {% if transaction.receiver %}
+                                                        To: {{ transaction.receiver.username }}
+                                                    {% elif transaction.sender %}
+                                                        From: {{ transaction.sender.username }}
+                                                    {% else %}
+                                                        {{ transaction.payment_method|default:'System' }}
+                                                    {% endif %}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-3 border-bottom text-muted small fw-bold">
+                                        #{{ transaction.transaction_id }}
+                                    </td>
+                                    <td class="py-3 px-3 border-bottom">
+                                        <div class="d-flex flex-column">
+                                            <span class="fw-bold text-dark">{{ transaction.date|date:"M d, Y" }}</span>
+                                            <small class="text-muted">{{ transaction.date|date:"h:i A" }}</small>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-3 border-bottom">
+                                        {% if transaction.status == 'failed' %}
+                                            <span class="fw-bold text-danger">-${{ transaction.amount|intcomma }}</span>
+                                        {% elif transaction.transaction_type == 'deposit' or transaction.receiver == request.user %}
+                                            <span class="fw-bold text-success">+${{ transaction.amount|intcomma }}</span>
+                                        {% else %}
+                                            <span class="fw-bold text-danger">-${{ transaction.amount|intcomma }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-3 px-3 border-bottom text-center">
+                                        {% if transaction.status == 'completed' %}
+                                            <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-bold">Completed</span>
+                                        {% elif transaction.status == 'pending' %}
+                                            <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill fw-bold">Pending</span>
+                                        {% elif transaction.status == 'processing' %}
+                                            <span class="badge bg-info-subtle text-info px-3 py-2 rounded-pill fw-bold">Processing</span>
+                                        {% elif transaction.status == 'failed' %}
+                                            <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill fw-bold">Failed</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill fw-bold">{{ transaction.status|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-3 px-3 border-bottom text-end">
+                                        <a href="{% url 'core:transaction-detail' transaction.transaction_id %}" class="btn btn-sm btn-light rounded-circle shadow-sm" style="width: 35px; height: 35px; background: #f8f9fa;">
+                                            <i class="fas fa-chevron-right text-muted" style="line-height: 25px;"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-5">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <i class="fas fa-receipt fa-4x text-muted mb-3 opacity-25"></i>
+                                            <h5 class="text-muted">No transactions found</h5>
+                                            <p class="text-muted small">Try adjusting your filters or make a new transaction.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <!-- Pagination -->
+                        {% if page_obj.has_other_pages %}
+                        <nav aria-label="Page navigation" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link border-0 text-muted shadow-sm m-1 rounded-circle" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                                {% endif %}
+
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link border-0 shadow-sm m-1 rounded-circle fw-bold" style="background-color: #0c266c; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">{{ num }}</span>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link border-0 text-dark shadow-sm m-1 rounded-circle fw-bold" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link border-0 text-muted shadow-sm m-1 rounded-circle" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Custom Styles unique to this page if needed -->
+<style>
+    .form-control:focus, .form-select:focus {
+        box-shadow: none;
+        border: 2px solid #0c266c;
+    }
+    .page-link:focus {
+        box-shadow: none;
+    }
+    .badge {
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    .bg-success-subtle { background-color: rgba(46, 204, 113, 0.15) !important; color: #27ae60 !important; }
+    .bg-warning-subtle { background-color: rgba(241, 196, 15, 0.15) !important; color: #d4ac0d !important; }
+    .bg-danger-subtle { background-color: rgba(231, 76, 60, 0.15) !important; color: #c0392b !important; }
+    .bg-info-subtle { background-color: rgba(52, 152, 219, 0.15) !important; color: #2980b9 !important; }
+    .bg-secondary-subtle { background-color: rgba(149, 165, 166, 0.15) !important; color: #7f8c8d !important; }
+</style>
+{% endblock content %}

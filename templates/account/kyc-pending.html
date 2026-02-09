@@ -1,0 +1,28 @@
+{% extends 'partials/dashboard-base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="dashboard-section body-collapse">
+    <div class="overlay pt-120">
+        <div class="container-fruid">
+            <div class="main-content">
+                <div class="row justify-content-center">
+                    <div class="col-xl-8">
+                        <div class="section-text text-center">
+                            <i class="fas fa-clock fa-5x text-warning mb-4"></i>
+                            <h3 class="title">KYC Under Review</h3>
+                            <p>Thank you for submitting your KYC documents. Your account is currently under review by our compliance team.</p>
+                            <p>This process typically takes 24-48 hours. You will receive an email notification once your account has been approved.</p>
+                            <p>In the meantime, you cannot perform any transactions.</p>
+                            
+                            <div class="btn-border w-100 mt-4" style="max-width: 300px; margin: 0 auto;">
+                                <a href="{% url 'userauths:sign-out' %}" class="cmn-btn w-100">Sign Out</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

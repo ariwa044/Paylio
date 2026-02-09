@@ -1,0 +1,281 @@
+{% extends 'partials/dashboard-base.html' %}
+{% load static %}
+
+{% block styles %}
+<style>
+    .crypto-form {
+        max-width: 100%;
+    }
+
+    .crypto-selector {
+        margin-bottom: 30px;
+    }
+
+    .crypto-card {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .crypto-card:hover,
+    .crypto-card.selected {
+        border-color: #007bff;
+        background-color: #f8f9fa;
+    }
+
+    .crypto-card .crypto-icon {
+        width: 40px;
+        height: 40px;
+        margin-right: 15px;
+    }
+
+    .crypto-card .crypto-info {
+        flex: 1;
+    }
+
+    .crypto-rate {
+        font-size: 14px;
+        color: #666;
+    }
+
+    .payment-details {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 25px;
+        margin-top: 30px;
+    }
+
+    .payment-details .qr-code {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .payment-details .qr-code img {
+        width: 200px;
+        height: 200px;
+    }
+
+    .payment-info .detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .payment-info .detail-item:last-child {
+        border-bottom: none;
+    }
+
+    .copy-btn {
+        background: none;
+        border: none;
+        color: #007bff;
+        cursor: pointer;
+        padding: 0;
+        margin-left: 10px;
+    }
+
+    .timer {
+        text-align: center;
+        margin: 20px 0;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .payment-status {
+        text-align: center;
+        margin-top: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="dashboard-section body-collapse">
+    <div class="overlay pt-120">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-xl-8">
+                    <div class="section-content">
+                        <div class="deposit-box">
+                            <div class="section-header">
+                                <h5 class="title mb-3">Cryptocurrency Deposit</h5>
+                                <p class="text-muted">Choose your preferred cryptocurrency</p>
+                            </div>
+
+                            <form action="" method="POST" class="crypto-form">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <!-- Amount -->
+                                    <div class="col-12 mb-4">
+                                        <div class="form-group">
+                                            <label for="amount" class="mdr mb-2">Amount to Deposit (USD)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" class="form-control" name="amount" id="amount" 
+                                                       required min="1" step="0.01" placeholder="Enter amount in USD">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Crypto Selection -->
+                                    <div class="col-12">
+                                        <div class="crypto-selector">
+                                            <label class="mdr mb-3">Select Cryptocurrency</label>
+                                            {% for crypto_id, crypto_name in cryptocurrencies %}
+                                            <div class="crypto-card d-flex align-items-center" 
+                                                 onclick="selectCrypto('{{ crypto_id }}')">
+                                                <img src="{% static 'assets1/images/crypto/'|add:crypto_id|lower|add:'.png' %}" 
+                                                     alt="{{ crypto_name }}" class="crypto-icon">
+                                                <div class="crypto-info">
+                                                    <h6 class="mb-1">{{ crypto_name }}</h6>
+                                                    <span class="crypto-rate" id="rate-{{ crypto_id }}">
+                                                        Loading rate...
+                                                    </span>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input type="radio" name="crypto_currency" 
+                                                           value="{{ crypto_id }}" class="form-check-input"
+                                                           required id="crypto-{{ crypto_id }}">
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Submit Button -->
+                                    <div class="col-12">
+                                        <button type="submit" class="cmn-btn w-100">
+                                            <i class="fas fa-wallet me-2"></i>Generate Payment Address
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+
+                            {% if payment_info %}
+                            <div class="payment-details mt-4">
+                                <div class="qr-code">
+                                    <img src="{{ payment_info.qr_code }}" alt="QR Code">
+                                </div>
+                                
+                                <div class="timer">
+                                    Time remaining: <span id="countdown">15:00</span>
+                                </div>
+
+                                <div class="payment-info">
+                                    <div class="detail-item">
+                                        <span class="label">Amount to Send</span>
+                                        <span class="value">
+                                            {{ payment_info.crypto_amount }} {{ payment_info.crypto_currency }}
+                                            <button class="copy-btn" onclick="copyToClipboard('{{ payment_info.crypto_amount }}')">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="label">Payment Address</span>
+                                        <span class="value">
+                                            {{ payment_info.address }}
+                                            <button class="copy-btn" onclick="copyToClipboard('{{ payment_info.address }}')">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="label">Network</span>
+                                        <span class="value">{{ payment_info.network }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="payment-status">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Waiting for payment confirmation...
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block scripts %}
+<script>
+// Function to select cryptocurrency
+function selectCrypto(cryptoId) {
+    // Remove selected class from all cards
+    document.querySelectorAll('.crypto-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Add selected class to clicked card
+    const selectedCard = document.querySelector(`#crypto-${cryptoId}`).closest('.crypto-card');
+    selectedCard.classList.add('selected');
+    
+    // Check the radio input
+    document.querySelector(`#crypto-${cryptoId}`).checked = true;
+}
+
+// Function to copy text to clipboard
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        alert('Copied to clipboard!');
+    }).catch(function(err) {
+        alert('Failed to copy text');
+    });
+}
+
+// Function to update crypto rates
+function updateCryptoRates() {
+    {% for crypto_id, _ in cryptocurrencies %}
+    fetch(`/api/crypto-rate/${crypto_id.toLowerCase()}`)
+        .then(response => response.json())
+        .then(data => {
+            document.querySelector(`#rate-${crypto_id}`).textContent = 
+                `1 ${crypto_id} = $${data.rate}`;
+        })
+        .catch(error => {
+            document.querySelector(`#rate-${crypto_id}`).textContent = 
+                'Rate unavailable';
+        });
+    {% endfor %}
+}
+
+// Update rates initially and every minute
+updateCryptoRates();
+setInterval(updateCryptoRates, 60000);
+
+// Countdown timer
+{% if payment_info %}
+function startCountdown() {
+    let timeLeft = 15 * 60; // 15 minutes in seconds
+    const countdownElement = document.getElementById('countdown');
+    
+    const timer = setInterval(() => {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        
+        countdownElement.textContent = 
+            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            location.reload(); // Reload page when timer expires
+        }
+        
+        timeLeft--;
+    }, 1000);
+}
+
+startCountdown();
+{% endif %}
+</script>
+{% endblock %}
+
+{% endblock %}

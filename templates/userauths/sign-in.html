@@ -24,11 +24,7 @@
                             <span class="or">Or Continue With</span> -->
                         </div>
                         
-                        {% if messages %}
-                            {% for message in messages %}
-                                <strong>{{ message }}</strong>
-                            {% endfor %}
-                        {% endif %}
+                        <!-- Messages are handled globally in base.html -->
                             
                         <form method="POST">
                             {% csrf_token %}

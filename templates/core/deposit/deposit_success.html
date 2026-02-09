@@ -1,0 +1,221 @@
+{% extends 'partials/dashboard-base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<style>
+    .deposit-success-section {
+        padding: 40px 0;
+    }
+
+    .deposit-success-wrapper {
+        max-width: 550px;
+        margin: 0 auto;
+    }
+    
+    .success-box {
+        background: #fff;
+        border-radius: 24px;
+        padding: 50px 40px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+        border: 1px solid rgba(0,0,0,0.02);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Decorative top bar */
+    .success-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #2ecc71, #27ae60);
+    }
+    
+    .success-box.pending::before {
+        background: linear-gradient(90deg, #f1c40f, #f39c12);
+    }
+
+    .icon-container {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 30px;
+        position: relative;
+    }
+
+    .icon-container.success {
+        background: rgba(46, 204, 113, 0.1);
+        color: #2ecc71;
+    }
+
+    .icon-container.pending {
+        background: rgba(241, 196, 15, 0.1);
+        color: #f1c40f;
+    }
+
+    .icon-container i {
+        font-size: 48px;
+    }
+
+    /* Pulse animation for pending */
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(241, 196, 15, 0.4); }
+        70% { box-shadow: 0 0 0 15px rgba(241, 196, 15, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(241, 196, 15, 0); }
+    }
+
+    .icon-container.pending {
+        animation: pulse 2s infinite;
+    }
+
+    .success-title {
+        font-size: 28px;
+        font-weight: 800;
+        color: #2d3436;
+        margin-bottom: 10px;
+    }
+
+    .success-message {
+        color: #636e72;
+        font-size: 16px;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+
+    .transaction-card {
+        background: #f8f9fa;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 30px;
+        border: 1px dashed #dfe6e9;
+    }
+
+    .amount-large {
+        font-size: 32px;
+        font-weight: 800;
+        color: #0c267f;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .txn-id {
+        font-size: 14px;
+        color: #b2bec3;
+        font-family: monospace;
+        letter-spacing: 1px;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px 30px;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s;
+        margin: 5px;
+        min-width: 200px;
+    }
+
+    .btn-primary-custom {
+        background: #0c267f;
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(12, 38, 127, 0.3);
+    }
+
+    .btn-primary-custom:hover {
+        background: #0a1f6a;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(12, 38, 127, 0.4);
+        color: #fff;
+    }
+
+    .btn-outline-custom {
+        border: 2px solid #dfe6e9;
+        color: #636e72;
+        background: transparent;
+    }
+
+    .btn-outline-custom:hover {
+        border-color: #b2bec3;
+        color: #2d3436;
+        background: #f8f9fa;
+    }
+
+</style>
+
+<section class="dashboard-section body-collapse pay step">
+    <div class="overlay pt-120">
+        <div class="container-fruid">
+            <div class="main-content">
+                <div class="deposit-success-section">
+                    <div class="deposit-success-wrapper">
+                        {% if transaction.status == 'completed' %}
+                        
+                        <!-- Success State -->
+                        <div class="success-box">
+                            <div class="icon-container success">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <h2 class="success-title">Deposit Successful!</h2>
+                            <p class="success-message">Your funds have been successfully added to your account balance.</p>
+                            
+                            <div class="transaction-card">
+                                <span class="amount-large">${{ transaction.amount|floatformat:2|intcomma }}</span>
+                                <span class="txn-id">ID: {{ transaction.transaction_id }}</span>
+                                <div class="mt-2">
+                                    <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">Completed</span>
+                                </div>
+                            </div>
+                            
+                            <div class="actions">
+                                <a href="{% url 'account:dashboard' %}" class="action-btn btn-primary-custom">
+                                    Go to Dashboard
+                                </a>
+                                <a href="{% url 'core:initiate-deposit' %}" class="action-btn btn-outline-custom">
+                                    Make Another Deposit
+                                </a>
+                            </div>
+                        </div>
+
+                        {% else %}
+
+                        <!-- Pending/Processing State -->
+                        <div class="success-box pending">
+                            <div class="icon-container pending">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <h2 class="success-title">Request Submitted</h2>
+                            <p class="success-message">Your deposit request has been received and is currently <strong>Processing</strong> details. Funds will be credited shortly.</p>
+                            
+                            <div class="transaction-card">
+                                <span class="amount-large">${{ transaction.amount|floatformat:2|intcomma }}</span>
+                                <span class="txn-id">ID: {{ transaction.transaction_id }}</span>
+                                <div class="mt-2">
+                                    <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill">Processing</span>
+                                </div>
+                            </div>
+                            
+                            <div class="actions">
+                                <a href="{% url 'account:dashboard' %}" class="action-btn btn-primary-custom">
+                                    Return to Dashboard
+                                </a>
+                            </div>
+                        </div>
+                        
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

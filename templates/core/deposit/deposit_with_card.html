@@ -1,0 +1,250 @@
+{% extends 'partials/dashboard-base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .deposit-wrapper {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    /* Card Preview */
+    .saved-card-preview {
+        position: relative;
+        border-radius: 20px;
+        padding: 35px;
+        color: #fff;
+        min-height: 220px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        margin-bottom: 40px;
+        overflow: hidden;
+    }
+    
+    .saved-card-preview::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.15) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    
+    /* Card Type Gradients */
+    .saved-card-preview.visa { background: linear-gradient(135deg, #1A1F71 0%, #29318C 100%); }
+    .saved-card-preview.master { background: linear-gradient(135deg, #EB001B 0%, #F79E1B 100%); }
+    .saved-card-preview.amex { background: linear-gradient(135deg, #006FCF 0%, #004687 100%); }
+    .saved-card-preview.discover { background: linear-gradient(135deg, #FF6000 0%, #FF9D00 100%); }
+    .saved-card-preview.verve { background: linear-gradient(135deg, #00A859 0%, #006A3B 100%); }
+    .saved-card-preview.default { background: linear-gradient(135deg, #4743c9 0%, #0c266c 100%); }
+    
+    .card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    
+    .chip {
+        width: 45px;
+        height: 35px;
+        background: linear-gradient(135deg, #ffd700 0%, #fdb931 100%);
+        border-radius: 6px;
+    }
+    
+    .brand-logo {
+        font-size: 40px;
+        opacity: 0.9;
+    }
+    
+    .card-number {
+        font-family: 'Courier New', monospace;
+        font-size: 24px;
+        letter-spacing: 3px;
+        margin: 25px 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .card-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+    
+    .cardholder {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .expiry {
+        text-align: right;
+    }
+    
+    .expiry .label {
+        font-size: 10px;
+        text-transform: uppercase;
+        opacity: 0.7;
+    }
+    
+    .expiry .value {
+        font-size: 16px;
+        font-weight: 600;
+    }
+    
+    /* Amount Form */
+    .amount-form {
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    }
+    
+    .form-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #0c266c;
+        margin-bottom: 30px;
+    }
+    
+    .amount-input-group {
+        position: relative;
+        margin-bottom: 30px;
+    }
+    
+    .currency-prefix {
+        position: absolute;
+        left: 25px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 28px;
+        font-weight: 700;
+        color: #4743c9;
+    }
+    
+    .amount-input {
+        width: 100%;
+        padding: 25px 25px 25px 60px;
+        font-size: 28px;
+        font-weight: 700;
+        color: #4743c9;
+        border: 2px solid #eef0f8;
+        border-radius: 16px;
+        background: #f9faff;
+        transition: all 0.3s;
+    }
+    
+    .amount-input:focus {
+        border-color: #4743c9;
+        background: #fff;
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(71, 67, 201, 0.1);
+    }
+    
+    .btn-deposit {
+        width: 100%;
+        padding: 20px;
+        font-size: 18px;
+        font-weight: 700;
+        color: #fff;
+        background: linear-gradient(135deg, #4743c9 0%, #0c266c 100%);
+        border: none;
+        border-radius: 14px;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 10px 25px rgba(71, 67, 201, 0.25);
+    }
+    
+    .btn-deposit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 35px rgba(71, 67, 201, 0.35);
+    }
+    
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        color: #6c757d;
+        text-decoration: none;
+        font-size: 14px;
+    }
+    
+    .back-link:hover {
+        color: #4743c9;
+    }
+</style>
+
+<section class="dashboard-section body-collapse pay step">
+    <div class="overlay pt-120">
+        <div class="container-fruid">
+            <div class="main-content">
+                <div class="deposit-wrapper">
+                    
+                    <!-- Header -->
+                    <div class="head-area text-center mb-4">
+                        <h4 class="title">Deposit with Saved Card</h4>
+                        <p class="text-muted">Enter the amount you want to deposit</p>
+                    </div>
+                    
+                    <!-- Card Preview -->
+                    <div class="saved-card-preview {{ credit_card.card_type }}">
+                        <div class="card-top">
+                            <div class="chip"></div>
+                            <div class="brand-logo">
+                                {% if credit_card.card_type == 'visa' %}
+                                <i class="fa-brands fa-cc-visa" style="color: #005eff;"></i>
+                                {% elif credit_card.card_type == 'master' %}
+                                <i class="fa-brands fa-cc-mastercard" style="color: #0a0a0a;"></i>
+                                {% elif credit_card.card_type == 'amex' %}
+                                <i class="fa-brands fa-cc-amex" style="color: #74C0FC;"></i>
+                                {% elif credit_card.card_type == 'discover' %}
+                                <i class="fa-brands fa-cc-discover" style="color: #f7ab08;"></i>
+                                {% else %}
+                                <i class="fa-solid fa-credit-card" style="color: #04307c;"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="card-number">{{ credit_card.masked_number }}</div>
+                        
+                        <div class="card-bottom">
+                            <div class="cardholder">{{ credit_card.name }}</div>
+                            <div class="expiry">
+                                <div class="label">Expires</div>
+                                <div class="value">{{ credit_card.expiry_display }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Amount Form -->
+                    <div class="amount-form">
+                        <form action="" method="POST">
+                            {% csrf_token %}
+                            
+                            <div class="form-title">Enter Amount</div>
+                            
+                            <div class="amount-input-group">
+                                <span class="currency-prefix">$</span>
+                                <input type="number" name="amount" class="amount-input" 
+                                       placeholder="0.00" step="0.01" min="1" required autofocus>
+                            </div>
+                            
+                            <button type="submit" class="btn-deposit" style="width: 100%; border: none; border-radius: 20px; background: #0c267f;">
+                                Proceed to Deposit
+                            </button>
+                        </form>
+                        
+                        <a href="{% url 'core:all-cards' %}" class="back-link">
+                            <i class="fas fa-arrow-left me-1"></i> Back to My Cards
+                        </a>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

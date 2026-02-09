@@ -1,0 +1,95 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="dashboard-section body-collapse">
+    <div class="overlay pt-120">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="content-wrapper">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="section-header">
+                                    <h4>Confirm Withdrawal</h4>
+                                    <p class="mdr">Please review and confirm your withdrawal details</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xl-8 col-lg-10 mx-auto">
+                                <div class="single-box p-5">
+                                    <div class="confirmation-details mb-4">
+                                        <h5 class="mb-4">Withdrawal Summary</h5>
+
+                                        <div class="summary-item p-3 mb-2 bg-light rounded">
+                                            <div class="row">
+                                                <div class="col-6"><strong>Amount:</strong></div>
+                                                <div class="col-6 text-right">
+                                                    <h4 class="text-primary">${{ withdrawal.amount|floatformat:2 }}</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="summary-item p-3 mb-2 border rounded">
+                                            <div class="row mb-2">
+                                                <div class="col-6"><strong>Transaction ID:</strong></div>
+                                                <div class="col-6 text-right text-muted">{{ withdrawal.transaction_id }}
+                                                </div>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <div class="col-6"><strong>Bank Details:</strong></div>
+                                                <div class="col-6 text-right">{{ withdrawal.description }}</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6"><strong>Status:</strong></div>
+                                                <div class="col-6 text-right"><span class="badge badge-warning">{{
+                                                        withdrawal.status|title }}</span></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="alert alert-info mt-4">
+                                            <i class="fas fa-info-circle"></i> You will need to enter your PIN to
+                                            complete this withdrawal.
+                                        </div>
+                                    </div>
+
+                                    <form method="POST"
+                                        action="{% url 'core:process-withdrawal' withdrawal.transaction_id %}">
+                                        {% csrf_token %}
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="single-input">
+                                                    <label for="pin_number">Enter PIN</label>
+                                                    <input type="password" name="pin_number" id="pin_number"
+                                                        maxlength="4" pattern="\d{4}" required placeholder="4-digit PIN"
+                                                        autocomplete="off">
+                                                    <small class="form-text text-muted">Enter your 4-digit PIN to
+                                                        authorize this withdrawal</small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-4">
+                                            <div class="col-md-6">
+                                                <a href="{% url 'account:dashboard' %}"
+                                                    class="btn btn-secondary btn-block">Cancel</a>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <button type="submit" class="cmn-btn btn-block">Confirm
+                                                    Withdrawal</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

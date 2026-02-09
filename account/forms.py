@@ -29,17 +29,19 @@ class KYCForm(forms.ModelForm):
             'state',
             'city',
             'mobile',
-            'fax',
+            'mothers_maiden_name',
 
         ] 
 
         widgets = {
             "full_name": forms.TextInput(attrs={"placeholder":"Full Name"}),
             "mobile": forms.TextInput(attrs={"placeholder":"Mobile Number"}),
-            "fax": forms.TextInput(attrs={"placeholder":"Fax Number"}),
+            "mothers_maiden_name": forms.TextInput(attrs={"placeholder":"Mother's Maiden Name"}),
             "country": forms.TextInput(attrs={"placeholder":"Country"}),
             "state": forms.TextInput(attrs={"placeholder":"State"}),
             "city": forms.TextInput(attrs={"placeholder":"City"}),
-            'date_of_birth':DateInput
-
+            'date_of_birth': DateInput,
+            'marital_status': forms.Select(attrs={"class": "kyc-select"}),
+            'gender': forms.Select(attrs={"class": "kyc-select"}),
+            'identity_type': forms.Select(attrs={"class": "kyc-select"}),
         }   

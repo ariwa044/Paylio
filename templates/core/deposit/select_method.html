@@ -1,0 +1,226 @@
+{% extends 'partials/dashboard-base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="dashboard-section body-collapse pay step">
+    <div class="overlay pt-120">
+        <div class="container-fruid">
+            <div class="main-content">
+                <div class="head-area d-flex align-items-center justify-content-between mb-4">
+                    <h4>Add Money</h4>
+                    <div class="icon-area">
+                        <img src="{% static 'assets1/images/icon/support-icon.png' %}" alt="icon">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Bank Transfer Option -->
+                    <div class="col-md-6 mb-4">
+                        <a href="{% url 'core:bank-transfer-deposit' %}"
+                            class="single-item d-block text-center p-5 bg-white rounded shadow-sm text-decoration-none transition-hover">
+                            <div class="icon-area mb-3">
+                                <img src="{% static 'assets1/images/icon/bank-account-icon.png' %}" alt="Bank Transfer"
+                                    style="width: 60px; height: 60px; object-fit: contain;">
+                            </div>
+                            <h3>Bank Transfer</h3>
+                            <p class="text-muted mt-2">Deposit via direct bank transfer. Safe and secure.</p>
+                        </a>
+                    </div>
+                    
+                    <!-- Card Payment Option -->
+                    <div class="col-md-6 mb-4">
+                        <div data-bs-toggle="modal" data-bs-target="#cardDepositModal"
+                            class="single-item d-block text-center p-5 bg-white rounded shadow-sm text-decoration-none transition-hover">
+                            <div class="icon-area mb-3">
+                                <img src="{% static 'assets1/images/icon/pay.png' %}" alt="Credit/Debit Card"
+                                    style="width: 60px; height: 60px; object-fit: contain;">
+                            </div>
+                            <h3>Credit / Debit Card</h3>
+                            <p class="text-muted mt-2">Instant deposit via Visa, Mastercard, or Verve.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+</section>
+
+<!-- Card Deposit Selection Modal -->
+<div class="modal fade" id="cardDepositModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select Payment Method</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-grid gap-3">
+                    {% if credit_cards %}
+                        <p class="text-muted mb-2">Select a Saved Card</p>
+                        
+                        <!-- Horizontal Card Slider -->
+                        <div class="card-slider-container">
+                            <div class="card-slider">
+                                {% for card in credit_cards %}
+                                <a href="{% url 'core:deposit-with-saved-card' card.card_id %}" class="slider-card-item">
+                                    <div class="slider-card-visual" data-brand="{{ card.card_type }}">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <div class="slider-chip"></div>
+                                            <div class="slider-brand-icon">
+                                                {% if card.card_type == 'visa' %}
+                                                <i class="fa-brands fa-cc-visa" style="color: #005eff;"></i>
+                                                {% elif card.card_type == 'master' %}
+                                                <i class="fa-brands fa-cc-mastercard" style="color: #0a0a0a;"></i>
+                                                {% elif card.card_type == 'amex' %}
+                                                <i class="fa-brands fa-cc-amex" style="color: #74C0FC;"></i>
+                                                {% elif card.card_type == 'discover' %}
+                                                <i class="fa-brands fa-cc-discover" style="color: #f7ab08;"></i>
+                                                {% else %}
+                                                <i class="fa-solid fa-credit-card" style="color: #04307c;"></i>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="slider-card-number mb-3">
+                                            {{ card.number|slice:"-4:"|rjust:"16"|slugify|slice:":-4"|default:"•••• •••• •••• " }} {{ card.number|slice:"-4:" }}
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-end">
+                                            <div class="slider-card-holder text-truncate">{{ card.name }}</div>
+                                            <div class="slider-card-expiry">{{ card.month }}/{{ card.year|stringformat:"02d"|slice:"-2:" }}</div>
+                                        </div>
+                                    </div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-2 mb-3">
+                            <small class="text-muted"><i class="fas fa-arrows-alt-h me-1"></i> Scroll to see more</small>
+                        </div>
+                        <hr class="my-2">
+                    {% endif %}
+                    
+                    <a href="{% url 'core:card-deposit' %}" class="btn btn-outline-primary btn-lg d-flex align-items-center justify-content-center">
+                        <i class="fas fa-plus-circle me-2"></i> Add New Card
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Card Slider Styles */
+    .card-slider-container {
+        width: 100%;
+        overflow: hidden;
+        padding: 10px 0;
+    }
+    
+    .card-slider {
+        display: flex;
+        overflow-x: auto;
+        gap: 15px;
+        padding: 5px 5px 20px 5px; /* Bottom padding for shadow */
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+    }
+    
+    .card-slider::-webkit-scrollbar {
+        display: none; /* Chrome/Safari */
+    }
+    
+    .slider-card-item {
+        flex: 0 0 260px; /* Fixed width for cards */
+        scroll-snap-align: center;
+        text-decoration: none;
+        transition: transform 0.3s ease;
+    }
+    
+    .slider-card-item:hover {
+        transform: translateY(-5px);
+    }
+    
+    .slider-card-visual {
+        background: linear-gradient(135deg, #4743c9 0%, #0c266c 100%);
+        border-radius: 15px;
+        padding: 20px;
+        color: white;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        position: relative;
+        overflow: hidden;
+        height: 160px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
+    /* Dynamic backgrounds based on brand */
+    .slider-card-visual[data-brand="visa"] { background: linear-gradient(135deg, #1A1F71 0%, #29318C 100%); }
+    .slider-card-visual[data-brand="master"] { background: linear-gradient(135deg, #EB001B 0%, #F79E1B 100%); }
+    .slider-card-visual[data-brand="amex"] { background: linear-gradient(135deg, #006FCF 0%, #004687 100%); }
+    .slider-card-visual[data-brand="discover"] { background: linear-gradient(135deg, #FF6000 0%, #FF9D00 100%); }
+    .slider-card-visual[data-brand="verve"] { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); }
+    
+    .slider-card-visual::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at 85% 15%, rgba(255,255,255,0.15) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    
+    .slider-chip {
+        width: 35px;
+        height: 25px;
+        background: linear-gradient(135deg, #ffd700 0%, #fdb931 100%);
+        border-radius: 4px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    .slider-brand-icon {
+        font-size: 24px;
+        color: rgba(255,255,255,0.9);
+    }
+    
+    .slider-card-number {
+        font-family: 'Courier New', monospace;
+        font-size: 18px;
+        letter-spacing: 2px;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        margin-top: auto; /* Push to bottom */
+    }
+    
+    .slider-card-holder {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.8;
+        max-width: 150px;
+    }
+    
+    .slider-card-expiry {
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* Original Styles */
+    .single-item {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid #f0f0f0;
+        cursor: pointer;
+    }
+    .single-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+        border-color: #5d34ff; /* Primary color hint */
+    }
+    .single-item h3 {
+        color: #333;
+        font-weight: 600;
+    }
+</style>
+{% endblock content %}

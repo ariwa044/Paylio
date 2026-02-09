@@ -16,35 +16,92 @@
                     <div class="col-xl-5">
                         <div class="section-text text-center">
                             <h5 class="sub-title">Account</h5>
-                            <h2 class="title">Welcome to Paylio</h2>
-                            <p class="dont-acc">Already have an account? <a href="{% url 'userauths:sign-in' %}">Login</a></p>
-                            <!-- <div class="reg-google">
-                                <a href="javascript:void(0)"><i class="fab fa-google"></i>Sign up with Google</a>
-                            </div>
-                            <span class="or">Or Continue With</span> -->
+                            <h2 class="title">Create Your Account</h2>
+                            <p class="dont-acc">Already have an account? <a href="{% url 'userauths:sign-in' %}">Login here</a></p>
                         </div>
                         <form method="POST">
                             {% csrf_token %}
-
+                            
+                            {% if form.errors %}
+                                <div class="alert alert-danger text-left">
+                                    <strong>Please correct the following errors:</strong>
+                                    <ul class="mb-0 pl-3">
+                                        {% for field, errors in form.errors.items %}
+                                            {% for error in errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            
                             <div class="row">
                                 <div class="col-12">
                                     <div class="single-input">
-                                        {{form.username}}
-                                    </div>
-                                    <div class="single-input">
+                                        <label for="id_email">Email Address</label>
                                         {{form.email}}
+                                        {% if form.email.errors %}
+                                            <div class="form-error-message">
+                                                {{ form.email.errors }}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                     <div class="single-input">
-                                        {{form.password1}}
+                                        <label for="id_password1">Password</label>
+                                        <div class="password-group position-relative">
+                                            {{form.password1}}
+                                            <span class="password-toggle" onclick="togglePassword('id_password1', this)" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #999;">
+                                                <i class="fas fa-eye"></i>
+                                            </span>
+                                        </div>
+                                        {% if form.password1.errors %}
+                                            <div class="form-error-message">
+                                                {{ form.password1.errors }}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                     <div class="single-input">
-                                        {{form.password2}}
+                                        <label for="id_password2">Confirm Password</label>
+                                        <div class="password-group position-relative">
+                                            {{form.password2}}
+                                            <span class="password-toggle" onclick="togglePassword('id_password2', this)" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #999;">
+                                                <i class="fas fa-eye"></i>
+                                            </span>
+                                        </div>
+                                        {% if form.password2.errors %}
+                                            <div class="form-error-message">
+                                                {{ form.password2.errors }}
+                                            </div>
+                                        {% endif %}
                                     </div>
+                                    
+                                    <div class="single-input d-flex align-items-center mb-4">
+                                        <input type="checkbox" id="terms" required style="width: 20px; height: 20px; margin-right: 10px;">
+                                        <label for="terms" class="mb-0" style="font-size: 14px;">I agree to the <a href="#" class="text-primary">Terms & Conditions</a> and <a href="#" class="text-primary">Privacy Policy</a>.</label>
+                                    </div>
+
                                     <button class="cmn-btn w-100" type="submit">Sign Up</button>
                                 </div>
                             </div>
                         </form>
                     </div>
+
+<script>
+    function togglePassword(inputId, toggleIcon) {
+        const input = document.getElementById(inputId);
+        const icon = toggleIcon.querySelector('i');
+        
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = "password";
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+</script>
                 </div>
             </div>
         </div>

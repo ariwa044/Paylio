@@ -1,0 +1,71 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="dashboard-section body-collapse">
+    <div class="overlay pt-120">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="content-wrapper">
+                        <div class="row">
+                            <div class="col-xl-6 col-lg-8 mx-auto text-center">
+                                <div class="single-box p-5">
+                                    <div class="icon-box mb-4">
+                                        <i class="fas fa-check-circle fa-4x text-success"></i>
+                                    </div>
+
+                                    <h3 class="mb-3 text-success">Withdrawal Successful!</h3>
+                                    <p class="text-muted mb-4">Your withdrawal has been processed successfully</p>
+
+                                    <div class="success-details p-4 bg-light rounded mb-4">
+                                        <div class="row mb-3">
+                                            <div class="col-12">
+                                                <h2 class="text-success mb-0">${{ withdrawal.amount|floatformat:2 }}
+                                                </h2>
+                                                <small class="text-muted">Withdrawn</small>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="row mb-2">
+                                            <div class="col-6 text-left"><strong>Transaction ID:</strong></div>
+                                            <div class="col-6 text-right text-muted">{{ withdrawal.transaction_id }}
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-6 text-left"><strong>Date:</strong></div>
+                                            <div class="col-6 text-right text-muted">{{ withdrawal.date|date:"M d, Y
+                                                H:i" }}</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-6 text-left"><strong>Bank Details:</strong></div>
+                                            <div class="col-6 text-right">{{ withdrawal.description|truncatewords:5 }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6 text-left"><strong>Status:</strong></div>
+                                            <div class="col-6 text-right"><span
+                                                    class="badge badge-success">Completed</span></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="alert alert-success">
+                                        <i class="fas fa-info-circle"></i> Funds have been deducted from your account
+                                        and will arrive in your bank account within 1-3 business days.
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <a href="{% url 'core:transaction-detail' withdrawal.transaction_id %}"
+                                            class="btn btn-outline-primary mr-2">View Transaction</a>
+                                        <a href="{% url 'account:dashboard' %}" class="cmn-btn">Return to Dashboard</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

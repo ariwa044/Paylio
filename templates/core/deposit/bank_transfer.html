@@ -1,0 +1,227 @@
+{% extends 'partials/dashboard-base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<section class="dashboard-section body-collapse">
+    <div class="overlay pt-120">
+        <div class="container-fluid">
+            <!-- Back Button Area -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <a href="{% url 'core:initiate-deposit' %}" class="btn btn-link text-decoration-none fw-bold" style="color: #0c266c;">
+                        <i class="fas fa-arrow-left me-2"></i> Back to Deposit Methods
+                    </a>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-xl-10 col-lg-12">
+                    <div class="row g-4">
+                        <!-- Left Column: Bank Details (Step 1) -->
+                        <div class="col-md-6">
+                            <div class="step-card h-100 position-relative">
+                                <span class="step-badge">1</span>
+                                <div class="bg-white rounded p-4 shadow-sm h-100 border-start border-4 border-primary" style="border-radius: 20px; border-left-color: #0c266c !important;">
+                                    <div class="text-center mb-4 pt-3">
+                                        <div class="icon-circle mb-3 d-flex align-items-center justify-content-center mx-auto" 
+                                             style="width: 70px; height: 70px; background: rgba(12, 38, 108, 0.1); border-radius: 50%;">
+                                            <i class="fas fa-university fa-2x" style="color: #0c266c;"></i>
+                                        </div>
+                                        <h5 class="fw-bold" style="color: #0c266c;">Make Transfer</h5>
+                                        <p class="text-muted small">Send your deposit to the account below.</p>
+                                    </div>
+
+                                    <div class="bank-details-card bg-light rounded p-4 mb-3">
+                                        <div class="detail-row mb-3 pb-3 border-bottom">
+                                            <span class="d-block text-muted small fw-bold text-uppercase mb-1">Bank Name</span>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="fw-bold text-dark fs-5">Paylio Bank</span>
+                                                <button class="btn btn-white shadow-sm btn-sm rounded-circle copy-btn" data-clipboard-text="Paylio Bank" title="Copy">
+                                                    <i class="fas fa-copy text-primary"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-row mb-3 pb-3 border-bottom">
+                                            <span class="d-block text-muted small fw-bold text-uppercase mb-1">Account Number</span>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="fw-bold text-dark fs-4 text-primary">{{ account.account_number }}</span>
+                                                <button class="btn btn-white shadow-sm btn-sm rounded-circle copy-btn" data-clipboard-text="{{ account.account_number }}" title="Copy">
+                                                    <i class="fas fa-copy text-primary"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-row mb-3 pb-3 border-bottom">
+                                            <span class="d-block text-muted small fw-bold text-uppercase mb-1">Account Name</span>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="fw-bold text-dark fs-5">{{ account.user.kyc.full_name|default:account.user.username }}</span>
+                                                <button class="btn btn-white shadow-sm btn-sm rounded-circle copy-btn" data-clipboard-text="{{ account.user.kyc.full_name|default:account.user.username }}" title="Copy">
+                                                    <i class="fas fa-copy text-primary"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="alert alert-warning border-0 bg-warning-subtle d-flex align-items-start small" role="alert">
+                                        <i class="fas fa-exclamation-circle mt-1 me-2 text-warning"></i>
+                                        <div>
+                                            <strong>Important:</strong> Please use the exact Reference ID/Name below in your bank transfer description to ensure instant matching.
+                                        </div>
+                                    </div>
+
+                                    <div class="detail-row bg-primary-subtle p-3 rounded d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="d-block text-primary small fw-bold text-uppercase mb-1">Payment Reference</span>
+                                            <span class="fw-bold text-primary fs-5">Deposit</span>
+                                        </div>
+                                        <button class="btn btn-white shadow-sm btn-sm rounded-circle copy-btn" data-clipboard-text="Deposit" title="Copy">
+                                            <i class="fas fa-copy text-primary"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Submission Form (Step 2) -->
+                        <div class="col-md-6">
+                            <div class="step-card h-100 position-relative">
+                                <span class="step-badge">2</span>
+                                <div class="bg-white rounded p-4 shadow-sm h-100 border-start border-4 border-success" style="border-radius: 20px; border-left-color: #2ecc71 !important;">
+                                    <div class="mb-4 pt-3">
+                                        <h5 class="fw-bold" style="color: #0c266c;">Confirm Transaction</h5>
+                                        <p class="text-muted small">Enter the amount you sent and the transaction ID from your receipt.</p>
+                                    </div>
+
+                                    <form action="" method="POST" id="depositForm">
+                                        {% csrf_token %}
+                                        <div class="mb-4">
+                                            <label for="amount" class="form-label fw-bold small text-uppercase text-muted">Amount Sent</label>
+                                            <div class="input-group input-group-lg">
+                                                <span class="input-group-text border-1 bg-white fw-bold text-dark">$</span>
+                                                <input type="number" class="form-control border-1 bg-white fw-bold fs-5" name="amount" id="amount" 
+                                                       required min="1" step="0.01" placeholder="0.00" style="height: 60px;">
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-5">
+                                            <label for="reference" class="form-label fw-bold small text-uppercase text-muted">Transaction Reference / ID</label>
+                                            <div class="input-group input-group-lg">
+                                                <span class="input-group-text border-1 bg-white text-muted"><i class="fas fa-receipt"></i></span>
+                                                <input type="text" class="form-control border-1 bg-white" name="reference" id="reference" 
+                                                       required placeholder="e.g. TXN-12345678" style="height: 60px;">
+                                            </div>
+                                            <div class="form-text text-muted small mt-2"><i class="fas fa-info-circle me-1"></i> Located on your bank's transfer receipt</div>
+                                        </div>
+
+                                        <hr class="my-4 text-muted opacity-25">
+
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-primary btn-lg fw-bold py-3 shadow-lg hover-elevate" style="background: linear-gradient(135deg, #0c266c 0%, #4743c9 100%); border: none; border-radius: 12px;">
+                                                <i class="fas fa-check-circle me-2"></i> I Have Made the Transfer
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const copyBtns = document.querySelectorAll('.copy-btn');
+        
+        copyBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const textToCopy = this.getAttribute('data-clipboard-text');
+                
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    // Visual Feedback
+                    const originalIcon = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check text-success"></i>';
+                    this.classList.add('bg-success-subtle');
+                    
+                    setTimeout(() => {
+                        this.innerHTML = originalIcon;
+                        this.classList.remove('bg-success-subtle');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+            });
+        });
+    });
+</script>
+
+<style>
+    .step-badge {
+        position: absolute;
+        top: -15px;
+        left: 20px;
+        width: 40px;
+        height: 40px;
+        background: #0c266c;
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 18px;
+        box-shadow: 0 4px 10px rgba(12, 38, 108, 0.3);
+        z-index: 10;
+        border: 3px solid #f2f3f9;
+    }
+    .col-md-6:last-child .step-badge {
+        background: #2ecc71;
+        box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+    }
+    
+    .form-control:focus {
+        box-shadow: 0 0 0 4px rgba(12, 38, 108, 0.1);
+        border-color: #0c266c !important;
+    }
+    
+    .hover-elevate {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .hover-elevate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(12, 38, 108, 0.2) !important;
+    }
+
+    .copy-btn {
+        width: 38px; 
+        height: 38px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center;
+        transition: all 0.2s;
+        border: 1px solid #eef0f8;
+    }
+    .copy-btn:hover {
+        background-color: #e2e6ea;
+        transform: scale(1.1);
+        border-color: #dbe0e6;
+    }
+    .bg-primary-subtle {
+        background-color: rgba(12, 38, 108, 0.08) !important;
+    }
+    .bg-success-subtle {
+        background-color: rgba(46, 204, 113, 0.2) !important;
+    }
+    .bg-warning-subtle {
+        background-color: rgba(241, 196, 15, 0.15) !important;
+        color: #856404;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'partials/dashboard-base.html' %}
+{% load static %}
+
+
+{% block content %}
+
+<!-- Dashboard Section start -->
+<section class="dashboard-section body-collapse pay step">
+    <div class="overlay pt-120">
+        <div class="container-fruid">
+            <div class="main-content">
+                <div class="head-area d-flex align-items-center justify-content-between">
+                    <h4>External Transfer</h4>
+                    <div class="icon-area">
+                        <img src="{% static 'assets1/images/icon/support-icon.png' %}" alt="icon">
+                    </div>
+                </div>
+
+                <div class="text-center mb-4">
+                    <p>Enter the recipient's account number to proceed with an external bank transfer.</p>
+                </div>
+
+                <form method="POST" class="flex-fill">
+                    {% csrf_token %}
+                    <div class="form-group d-flex align-items-center">
+                        <img src="{% static 'assets1/images/icon/search.png' %}" alt="icon">
+                        <input type="text" placeholder="Enter Account Number" name="account_number" required>
+                        <button type='submit'><i class="fas fa-angle-right"></i></button>
+                    </div>
+                </form>
+
+                <div class="user-select">
+                    {% if beneficiaries %}
+                    <h5 class="mb-3">Saved Beneficiaries</h5>
+                    {% for b in beneficiaries %}
+                    <a href="{% url 'core:amount-transfare' b.account_number %}" class="single-user">
+                        <div class="left d-flex align-items-center">
+                            <div class="img-area">
+                                {% if b.beneficiary_account and b.beneficiary_account.user.kyc.image %}
+                                <img style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;"
+                                    src="{{b.beneficiary_account.user.kyc.image.url}}" alt="image">
+                                {% else %}
+                                <img style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;"
+                                    src="{% static 'assets1/images/default.jpg' %}" alt="image">
+                                {% endif %}
+                            </div>
+                            <div class="text-area">
+                                <p>{{b.name|title}}</p>
+                                <p>{{b.account_number}}</p>
+                                <small>{{b.bank_name}}</small>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                    <hr>
+                    {% endif %}
+                </div>
+
+                <div class="footer-area mt-40">
+                    <a href="{% url 'core:transfer-selection' %}">Previous Step</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Dashboard Section end -->
+
+{% endblock content %}
