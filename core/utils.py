@@ -2,11 +2,10 @@
 Core utility functions for the banking application.
 """
 from core.models import AccountFreeze
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
-from django.core.mail import send_mail
-from django.conf import settings
 
+import os
+import resend
+from django.template.loader import render_to_string
 
 def is_account_frozen(account):
     """
@@ -53,9 +52,10 @@ def get_freeze_reason_display(freeze_record):
     return reason_map.get(freeze_record.reason, 'Account Frozen')
 
 
+
 def send_html_email(subject, recipient_list, context, template_path='emails/notification_email.html'):
     """
-    Send an HTML email using a template.
+    Send an HTML email using Resend API.
     
     Args:
         subject (str): Email subject
@@ -63,23 +63,31 @@ def send_html_email(subject, recipient_list, context, template_path='emails/noti
         context (dict): Context data for template (must include 'message')
         template_path (str): Path to HTML template
     """
+    # Initialize Resend API key
+    resend.api_key = os.environ.get("RESEND_API_KEY")
+
     # Ensure subject is in context for header if not present
     if 'subject_header' not in context:
         context['subject_header'] = subject
         
     html_message = render_to_string(template_path, context)
-    plain_message = strip_tags(html_message)
-    email_from = settings.DEFAULT_FROM_EMAIL
+    email_from = os.environ.get("DEFAULT_FROM_EMAIL", "onboarding@resend.dev")
     
     try:
-        send_mail(
-            subject,
-            plain_message,
-            email_from,
-            recipient_list,
-            html_message=html_message,
-            fail_silently=True
-        )
+        # Convert recipient_list to single string if it's a list (Resend expects list or string)
+        # To be safe, we'll iterate or pass as is if Resend supports list. 
+        # Resend Python SDK supports list of strings for 'to'.
+        
+        params = {
+            "from": email_from,
+            "to": recipient_list,
+            "subject": subject,
+            "html": html_message,
+        }
+
+        email = resend.Emails.send(params)
+        print(f"Resend API Response: {email}") # Debugging
         return True
-    except Exception:
+    except Exception as e:
+        print(f"Resend API Error: {e}") # Debugging
         return False

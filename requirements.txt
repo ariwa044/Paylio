@@ -48,3 +48,6 @@ whitenoise
 django-import-export
 shortuuid
 django-shortuuidfield
+resend
+cloudinary
+django-cloudinary-storage

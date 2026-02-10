@@ -50,6 +50,10 @@ INSTALLED_APPS = [
     "core",
     "userauths",
     "account",
+    
+    # Media Storage
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 # NOWPayments Configuration
@@ -125,15 +129,9 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGIN_URL = "userauths:sign-in"
 LOGOUT_REDIRECT_URL = "userauths:sign-in"
 
-# Email Configuration
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'Paylio <escrowtrade02@gmail.com>')
-EMAIL_TIMEOUT = 10  # Timeout in seconds to prevent worker hangs
+# Email Configuration (emails sent via Resend API in core/utils.py)
+# RESEND_API_KEY is loaded from .env in core/utils.py
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'Paylio <onboarding@resend.dev>')
 
 
 # Internationalization
@@ -163,8 +161,14 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
 
-# WhiteNoise can also serve media files (optional, for user uploads)
-WHITENOISE_ROOT = MEDIA_ROOT
+# Cloudinary Storage (with auto-optimization via custom backend)
+DEFAULT_FILE_STORAGE = 'core.storage_backends.OptimizedMediaCloudinaryStorage'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
 
 
 # Default primary key field type
