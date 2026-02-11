@@ -25,8 +25,15 @@ def refund_failed_transfer(sender, instance, **kwargs):
                     notification_type="Credit Alert",
                     amount=instance.amount,
                     transaction_id=instance.transaction_id,
-                    # We might want a custom message or type for Refund, but relying on type for now or add desc key if supported
                 )
+
+                # Send Refund Email
+                try:
+                    subject = f'Credit Alert: Refund +${instance.amount}'
+                    message = f'Your transfer of ${instance.amount} (ID: {instance.transaction_id}) failed and has been refunded to your account.'
+                    send_html_email(subject, [instance.user.email], {'subject_header': 'Credit Alert - Refund', 'message': message})
+                except:
+                    pass
 
                 # Debit the Receiver (if internal and money was previously credited)
                 # Note: Logic assumes money was credited on 'completed'. 
@@ -75,6 +82,14 @@ def check_deposit_completion(sender, instance, **kwargs):
                     amount=instance.amount,
                     transaction_id=instance.transaction_id
                 )
+
+                # Send Email for admin approval
+                try:
+                    subject = f'Deposit Completed: +${instance.amount}'
+                    message = f'Your deposit of ${instance.amount} has been successfully processed and credited to your account.\nTransaction ID: {instance.transaction_id}'
+                    send_html_email(subject, [instance.user.email], {'subject_header': 'Deposit Completed', 'message': message})
+                except:
+                    pass
         except Deposit.DoesNotExist:
             pass
     else:

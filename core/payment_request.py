@@ -180,6 +180,22 @@ def settlement_processing(request, account_number, transaction_id):
                 transaction.status = "request_settled"
                 transaction.save()
 
+                # Send Debit Email to Payer
+                try:
+                    debit_subject = f'Debit Alert: -${transaction.amount}'
+                    debit_message = f'You settled a payment request of ${transaction.amount} to {account.user.kyc.full_name}.\nTransaction ID: {transaction.transaction_id}'
+                    send_html_email(debit_subject, [sender.email], {'subject_header': 'Debit Alert', 'message': debit_message})
+                except:
+                    pass
+
+                # Send Credit Email to Receiver (the one who made the request)
+                try:
+                    credit_subject = f'Credit Alert: +${transaction.amount}'
+                    credit_message = f'Your payment request of ${transaction.amount} has been settled by {sender.kyc.full_name}.\nTransaction ID: {transaction.transaction_id}'
+                    send_html_email(credit_subject, [account.user.email], {'subject_header': 'Credit Alert', 'message': credit_message})
+                except:
+                    pass
+
                 messages.success(request, f"settled to {account.user.kyc.full_name} was successfull.")
                 return redirect("core:settlement-completed",account.account_number, transaction.transaction_id)
 

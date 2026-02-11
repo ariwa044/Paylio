@@ -308,7 +308,7 @@ def TransfarProcess(request,account_number, transaction_id):
                         'subject_header': 'Credit Alert',
                         'message': message
                     }
-                    recipient_list = [reciver.email]
+                    recipient_list = [reciver_account.user.email]
                     send_html_email(subject, recipient_list, context)
                 except:
                     pass
