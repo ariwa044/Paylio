@@ -70,7 +70,7 @@ class Deposit(models.Model):
     status = models.CharField(choices=TRANSACTION_STATUS, max_length=100, default="pending")
     deposit_method = models.CharField(choices=DEPOSIT_METHOD, max_length=50, default="bank_transfer")
     credit_card = models.ForeignKey('CreditCard', on_delete=models.SET_NULL, null=True, blank=True, related_name="deposits")
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(default=timezone.now)
     
     @property
     def sender(self):
@@ -95,7 +95,7 @@ class Withdrawal(models.Model):
     account = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, related_name="withdrawal_account")
     amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     status = models.CharField(choices=TRANSACTION_STATUS, max_length=100, default="pending")
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(default=timezone.now)
 
     @property
     def sender(self):
@@ -129,7 +129,7 @@ class Transfer(models.Model):
     amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     description = models.CharField(max_length=1000, null=True, blank=True)
     status = models.CharField(choices=TRANSACTION_STATUS, max_length=100, default="pending")
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(default=timezone.now)
 
     TRANSFER_TYPES = (
         ("internal", "Internal"),
@@ -160,7 +160,7 @@ class PaymentRequest(models.Model):
     amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     description = models.CharField(max_length=1000, null=True, blank=True)
     status = models.CharField(choices=TRANSACTION_STATUS, max_length=100, default="pending")
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(default=timezone.now)
 
     @property
     def transaction_type(self):

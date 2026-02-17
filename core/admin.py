@@ -4,19 +4,19 @@ from .models import Transfer, Deposit, Withdrawal, PaymentRequest, CreditCard, N
 
 class TransferAdmin(admin.ModelAdmin):
     list_editable = ['amount', 'status']
-    list_display = ['user', 'amount', 'status', 'transfer_type', 'receiver']
+    list_display = ['user', 'amount', 'status', 'transfer_type', 'receiver', 'date']
 
 class DepositAdmin(admin.ModelAdmin):
     list_editable = ['amount', 'status']
-    list_display = ['user', 'amount', 'status']
+    list_display = ['user', 'amount', 'status', 'date']
 
 class WithdrawalAdmin(admin.ModelAdmin):
     list_editable = ['amount', 'status']
-    list_display = ['user', 'amount', 'status']
+    list_display = ['user', 'amount', 'status', 'date']
 
 class PaymentRequestAdmin(admin.ModelAdmin):
     list_editable = ['amount', 'status']
-    list_display = ['user', 'amount', 'status', 'sender', 'receiver']
+    list_display = ['user', 'amount', 'status', 'sender', 'receiver', 'date']
 
 class CreditCardAdmin(admin.ModelAdmin):
     list_editable = ['card_type', 'card_status']
