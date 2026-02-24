@@ -236,7 +236,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="javascript:void(0)">
+                                <a href="javascript:void(0)" onclick="if(typeof Tawk_API !== 'undefined'){Tawk_API.toggle();}">
                                     <img src="{% static 'assets1/images/icon/support.png' %}" alt="Support">
                                     <span>Support</span>
                                 </a>
@@ -471,6 +471,20 @@
     <script src="{% static 'assets1/js/plugin/wow.min.js' %}"></script>
     <script src="{% static 'assets1/js/plugin/plugin.js' %}"></script>
     <script src="{% static 'assets1/js/main.js' %}"></script>
+
+    <!--Start of Tawk.to Script-->
+    <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/699d70f4b2f3e31c2e61f935/1ji7g2fk3';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
+    <!--End of Tawk.to Script-->
 </body>
 
 </html>
