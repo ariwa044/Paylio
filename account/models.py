@@ -55,10 +55,11 @@ class Account(models.Model):
     kyc_reviewed_at = models.DateTimeField(blank=True, null=True)
     kyc_rejection_reason = models.TextField(blank=True, null=True)
     recommended_by = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True, related_name="recommended_by")
-    
     # PIN Security
     failed_pin_attempts = models.IntegerField(default=0)
     pin_lockout_until = models.DateTimeField(blank=True, null=True)
+    
+    business_account = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-date']

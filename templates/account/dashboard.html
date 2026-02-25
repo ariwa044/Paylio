@@ -115,7 +115,11 @@
                         <div class="acc-details">
                             <div class="top-area">
                                 <div class="left-side">
-                                    <h5>Hi, {{kyc.full_name}}</h5>
+                                    <h5>Hi, {{kyc.full_name}}
+                                        {% if account.business_account %}
+                                        <span class="badge ms-2" style="font-size: 0.7em; vertical-align: middle; padding: 0.4em 0.7em; border-radius: 6px; background: #5bc0de; color: #fff;">Corporate</span>
+                                        {% endif %}
+                                    </h5>
                                     <h2><span id="display-balance"
                                             data-balance="{{account.account_balance}}"></span>${{account.account_balance|floatformat:2|intcomma}}</span>
                                     </h2>
